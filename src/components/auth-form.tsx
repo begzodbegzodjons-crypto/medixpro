@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { createUserAction as createUser } from '@/lib/auth-client-actions'
 
 export default function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const router = useRouter()
@@ -23,11 +22,22 @@ export default function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 
     try {
       if (isSignUp) {
-        // Create the user via server action
-        await createUser({ email, password, name })
+        // Create the user via API route (not Server Action - avoids CSRF host check issues)
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name }),
+        })
+
+        if (!res.ok) {
+          const data = await res.json()
+          setError(data.message || 'Ro\'yxatdan o\'tishda xato yuz berdi')
+          setLoading(false)
+          return
+        }
       }
 
-      // Then sign in (works for both sign-up and sign-in)
+      // Then sign in via NextAuth (works for both sign-up and sign-in)
       const result = await signIn('credentials', {
         email,
         password,
