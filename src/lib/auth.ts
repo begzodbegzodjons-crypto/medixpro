@@ -53,11 +53,43 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/sign-in',
   },
+  // trustHost lets NextAuth auto-detect the host from request headers.
+  // This is critical when the app is served through a proxy / preview URL
+  // (e.g. preview-chat-XXX.space-z.ai) - it ensures cookies are set for the
+  // actual host the browser is using, not a hardcoded NEXTAUTH_URL.
+  trustHost: true,
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      },
+    },
+    callbackUrl: {
+      name: 'next-auth.callback-url',
+      options: {
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      },
+    },
+    csrfToken: {
+      name: 'next-auth.csrf-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      },
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        // Load fresh user data on first sign-in
         const dbUser = await db.user.findUnique({ where: { id: user.id! } })
         if (dbUser) {
           token.coinBalance = dbUser.coinBalance
