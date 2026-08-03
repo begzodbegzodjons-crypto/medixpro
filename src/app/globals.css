@@ -159,4 +159,56 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* === Mobile input fix === */
+  /* Ensure all inputs have visible text on mobile (white-on-white bug) */
+  html {
+    color-scheme: light;
+  }
+
+  input,
+  textarea,
+  select {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+    -webkit-text-fill-color: #111827 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Placeholder color */
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af !important;
+    -webkit-text-fill-color: #9ca3af !important;
+    opacity: 1;
+  }
+
+  /* Keep password dots visible */
+  input[type="password"] {
+    -webkit-text-security: disc !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+  }
+
+  /* Autofill override (Chrome/Safari mobile) */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #111827 !important;
+    caret-color: #111827 !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Number input spinner fix for mobile */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }

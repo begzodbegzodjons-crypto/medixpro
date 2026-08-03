@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth-client";
@@ -16,13 +16,21 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  colorScheme: 'light',
+  themeColor: '#2563eb',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="uz" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="uz" className="scroll-smooth" style={{ colorScheme: 'light' }} suppressHydrationWarning>
       <body className="antialiased bg-gray-50">
         <AuthProvider>{children}</AuthProvider>
         <Toaster />
