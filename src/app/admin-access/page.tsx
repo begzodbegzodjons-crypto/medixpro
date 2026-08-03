@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Lock, AlertCircle } from 'lucide-react'
 
-export default function AdminAccessPage() {
+function AdminAccessContent() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -101,5 +101,19 @@ export default function AdminAccessPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function AdminAccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <AdminAccessContent />
+    </Suspense>
   )
 }

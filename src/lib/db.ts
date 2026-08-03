@@ -5,22 +5,12 @@ import path from 'path'
 /**
  * Direct MySQL connection to TiDB Cloud via mysql2 driver.
  *
- * Why not Prisma Client at runtime?
- *   - Prisma v6 default MySQL driver doesn't accept SSL config via URL for TiDB Cloud
- *     (JSON ssl param is ignored, plain connection is rejected by TiDB).
- *   - The Prisma MariaDB driver adapter has SSL handshake bugs with Bun runtime.
- *   - mysql2 handles SSL gracefully with CA cert + rejectUnauthorized:false.
+ * Environment variables:
+ *   USTOZPRO_DATABASE_URL - mysql:// URL
+ *   TIDB_CA_CERT          - CA cert contents as string (production/Cloudflare) - optional
+ *   TIDB_CA_PATH          - path to CA cert file (dev) - optional
  *
- * Prisma is still used for:
- *   - Schema definition (prisma/schema.prisma)
- *   - Database migrations (prisma db push)
- *
- * This module exports:
- *   - pool: mysql2 connection pool
- *   - query<T>(): run SELECT, return rows
- *   - execute<T>(): run INSERT/UPDATE/DELETE, return result
- *   - transaction(): run multiple queries atomically
- *   - generateId(): CUID-like ID generator
+ * On Cloudflare Pages, nodejs_compat flag enables fs and net/tls support.
  */
 
 const globalForDb = globalThis as unknown as {
@@ -28,16 +18,25 @@ const globalForDb = globalThis as unknown as {
 }
 
 function loadCaCert(): string | undefined {
+  // 1. Direct cert contents (production/Cloudflare)
   if (process.env.TIDB_CA_CERT) return process.env.TIDB_CA_CERT
+
+  // 2. File path (local dev)
   const caPath = process.env.TIDB_CA_PATH
   if (caPath) {
     try {
       return fs.readFileSync(caPath, 'utf-8')
     } catch {}
   }
+
+  // 3. Default bundled path (works in dev)
   try {
-    return fs.readFileSync(path.join(process.cwd(), 'certs', 'tidb-ca.pem'), 'utf-8')
-  } catch {}
+    const defaultPath = path.join(process.cwd(), 'certs', 'tidb-ca.pem')
+    return fs.readFileSync(defaultPath, 'utf-8')
+  } catch {
+    // Workers environment - skip
+  }
+
   return undefined
 }
 
@@ -82,32 +81,16 @@ if (process.env.NODE_ENV !== 'production') globalForDb.mysqlPool = pool
 
 export type QueryResult = RowDataPacket[] | RowDataPacket[][] | ResultSetHeader
 
-/**
- * Execute a SELECT query and return rows.
- * Usage: const rows = await query<UserRow[]>('SELECT * FROM User WHERE id = ?', [userId])
- */
 export async function query<T = any>(sql: string, params: any[] = []): Promise<T> {
   const [rows] = await pool.query(sql, params)
   return rows as T
 }
 
-/**
- * Execute an INSERT/UPDATE/DELETE and return the result.
- */
 export async function execute<T = ResultSetHeader>(sql: string, params: any[] = []): Promise<T> {
   const [result] = await pool.execute(sql, params)
   return result as T
 }
 
-/**
- * Execute multiple queries in a transaction.
- * Usage:
- *   const result = await transaction(async (conn) => {
- *     await conn.query('INSERT ...', [...])
- *     await conn.query('UPDATE ...', [...])
- *     return { success: true }
- *   })
- */
 export async function transaction<T>(
   fn: (conn: PoolConnection) => Promise<T>
 ): Promise<T> {
@@ -125,7 +108,6 @@ export async function transaction<T>(
   }
 }
 
-// Backward-compat export
 export const db = {
   pool,
   query,
@@ -133,9 +115,6 @@ export const db = {
   transaction,
 }
 
-/**
- * Generate a CUID-like ID (24 chars, compatible with Prisma's default format).
- */
 export function generateId(): string {
   const ts = Date.now().toString(36).padStart(9, '0')
   const rand = Math.random().toString(36).substring(2, 14).padEnd(12, '0').substring(0, 15)
