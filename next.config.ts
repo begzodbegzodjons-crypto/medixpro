@@ -7,13 +7,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  bundlePagesRouterDependences: true,
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
-  // Cloudflare Workers doesn't support Node.js fs in the same way,
-  // but nodejs_compat flag handles it. We must avoid native addons.
-  serverExternalPackages: [],
 };
 
 export default nextConfig;

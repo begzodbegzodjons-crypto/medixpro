@@ -5,12 +5,14 @@ import path from 'path'
 /**
  * Direct MySQL connection to TiDB Cloud via mysql2 driver.
  *
+ * IMPORTANT: Pool is created LAZILY on first actual query. This allows the
+ * module to be safely imported during build time when DATABASE_URL is not set
+ * (Next.js page-data collection imports all route modules).
+ *
  * Environment variables:
  *   USTOZPRO_DATABASE_URL - mysql:// URL
- *   TIDB_CA_CERT          - CA cert contents as string (production/Cloudflare) - optional
+ *   TIDB_CA_CERT          - CA cert contents as string (Cloudflare) - optional
  *   TIDB_CA_PATH          - path to CA cert file (dev) - optional
- *
- * On Cloudflare Pages, nodejs_compat flag enables fs and net/tls support.
  */
 
 const globalForDb = globalThis as unknown as {
@@ -18,25 +20,19 @@ const globalForDb = globalThis as unknown as {
 }
 
 function loadCaCert(): string | undefined {
-  // 1. Direct cert contents (production/Cloudflare)
   if (process.env.TIDB_CA_CERT) return process.env.TIDB_CA_CERT
-
-  // 2. File path (local dev)
   const caPath = process.env.TIDB_CA_PATH
   if (caPath) {
     try {
       return fs.readFileSync(caPath, 'utf-8')
     } catch {}
   }
-
-  // 3. Default bundled path (works in dev)
   try {
     const defaultPath = path.join(process.cwd(), 'certs', 'tidb-ca.pem')
     return fs.readFileSync(defaultPath, 'utf-8')
   } catch {
     // Workers environment - skip
   }
-
   return undefined
 }
 
@@ -51,8 +47,12 @@ function parseConnectionString(url: string) {
   }
 }
 
+function getDatabaseUrl(): string | null {
+  return process.env.USTOZPRO_DATABASE_URL || process.env.DATABASE_URL || null
+}
+
 function createPool(): Pool {
-  const url = process.env.USTOZPRO_DATABASE_URL || process.env.DATABASE_URL
+  const url = getDatabaseUrl()
   if (!url) {
     throw new Error('Database URL not configured. Set USTOZPRO_DATABASE_URL.')
   }
@@ -75,26 +75,50 @@ function createPool(): Pool {
   })
 }
 
-export const pool: Pool = globalForDb.mysqlPool ?? createPool()
-
-if (process.env.NODE_ENV !== 'production') globalForDb.mysqlPool = pool
+/** Lazily create the pool on first access. */
+function getPool(): Pool {
+  if (!globalForDb.mysqlPool) {
+    globalForDb.mysqlPool = createPool()
+  }
+  return globalForDb.mysqlPool
+}
 
 export type QueryResult = RowDataPacket[] | RowDataPacket[][] | ResultSetHeader
 
+/**
+ * Pool is exposed via a getter function to avoid creating it at module load
+ * time. Use `getPool()` directly if you need raw pool access.
+ */
+export function getPoolInstance(): Pool {
+  return getPool()
+}
+
+/**
+ * Pool proxy for backward compatibility. Only creates the real pool when
+ * a property is accessed.
+ */
+export const pool: Pool = new Proxy({} as Pool, {
+  get(_target, prop, receiver) {
+    const p = getPool()
+    const value = Reflect.get(p, prop, receiver)
+    return typeof value === 'function' ? value.bind(p) : value
+  },
+})
+
 export async function query<T = any>(sql: string, params: any[] = []): Promise<T> {
-  const [rows] = await pool.query(sql, params)
+  const [rows] = await getPool().query(sql, params)
   return rows as T
 }
 
 export async function execute<T = ResultSetHeader>(sql: string, params: any[] = []): Promise<T> {
-  const [result] = await pool.execute(sql, params)
+  const [result] = await getPool().execute(sql, params)
   return result as T
 }
 
 export async function transaction<T>(
   fn: (conn: PoolConnection) => Promise<T>
 ): Promise<T> {
-  const conn = await pool.getConnection()
+  const conn = await getPool().getConnection()
   try {
     await conn.beginTransaction()
     const result = await fn(conn)
