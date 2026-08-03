@@ -1,134 +1,95 @@
-import mysql, { type Pool, type RowDataPacket, type ResultSetHeader, type PoolConnection } from 'mysql2/promise'
-import fs from 'fs'
-import path from 'path'
+import { connect, type Connection } from '@tidbcloud/serverless'
 
 /**
- * Direct MySQL connection to TiDB Cloud via mysql2 driver.
+ * TiDB Cloud Serverless driver (HTTP-based, edge-compatible).
  *
- * IMPORTANT: Pool is created LAZILY on first actual query. This allows the
- * module to be safely imported during build time when DATABASE_URL is not set
- * (Next.js page-data collection imports all route modules).
+ * This driver uses HTTPS to communicate with TiDB Cloud - no raw TCP/TLS
+ * sockets required. Works in Cloudflare Workers, Vercel Edge, Deno Deploy,
+ * and any environment with fetch().
  *
  * Environment variables:
- *   USTOZPRO_DATABASE_URL - mysql:// URL
- *   TIDB_CA_CERT          - CA cert contents as string (Cloudflare) - optional
- *   TIDB_CA_PATH          - path to CA cert file (dev) - optional
+ *   USTOZPRO_DATABASE_URL - mysql:// URL (TiDB Cloud connection string)
+ *
+ * Transactions:TiDB serverless driver supports interactive transactions via
+ * `conn.begin()` -> `tx.execute()` -> `tx.commit()`.
  */
 
 const globalForDb = globalThis as unknown as {
-  mysqlPool: Pool | undefined
-}
-
-function loadCaCert(): string | undefined {
-  if (process.env.TIDB_CA_CERT) return process.env.TIDB_CA_CERT
-  const caPath = process.env.TIDB_CA_PATH
-  if (caPath) {
-    try {
-      return fs.readFileSync(caPath, 'utf-8')
-    } catch {}
-  }
-  try {
-    const defaultPath = path.join(process.cwd(), 'certs', 'tidb-ca.pem')
-    return fs.readFileSync(defaultPath, 'utf-8')
-  } catch {
-    // Workers environment - skip
-  }
-  return undefined
-}
-
-function parseConnectionString(url: string) {
-  const parsed = new URL(url)
-  return {
-    host: parsed.hostname,
-    port: Number(parsed.port) || 3306,
-    user: decodeURIComponent(parsed.username),
-    password: decodeURIComponent(parsed.password),
-    database: parsed.pathname.replace('/', ''),
-  }
+  tidbConn: Connection | undefined
 }
 
 function getDatabaseUrl(): string | null {
   return process.env.USTOZPRO_DATABASE_URL || process.env.DATABASE_URL || null
 }
 
-function createPool(): Pool {
-  const url = getDatabaseUrl()
-  if (!url) {
-    throw new Error('Database URL not configured. Set USTOZPRO_DATABASE_URL.')
+function getConnection(): Connection {
+  if (!globalForDb.tidbConn) {
+    const url = getDatabaseUrl()
+    if (!url) {
+      throw new Error('Database URL not configured. Set USTOZPRO_DATABASE_URL.')
+    }
+    globalForDb.tidbConn = connect({ url })
   }
-  const config = parseConnectionString(url)
-  const ca = loadCaCert()
-
-  return mysql.createPool({
-    host: config.host,
-    port: config.port,
-    user: config.user,
-    password: config.password,
-    database: config.database,
-    ssl: ca ? { ca, rejectUnauthorized: false } : { rejectUnauthorized: false },
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 50,
-    connectTimeout: 30000,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 10000,
-  })
+  return globalForDb.tidbConn
 }
 
-/** Lazily create the pool on first access. */
-function getPool(): Pool {
-  if (!globalForDb.mysqlPool) {
-    globalForDb.mysqlPool = createPool()
-  }
-  return globalForDb.mysqlPool
-}
-
-export type QueryResult = RowDataPacket[] | RowDataPacket[][] | ResultSetHeader
-
-/**
- * Pool is exposed via a getter function to avoid creating it at module load
- * time. Use `getPool()` directly if you need raw pool access.
- */
-export function getPoolInstance(): Pool {
-  return getPool()
-}
-
-/**
- * Pool proxy for backward compatibility. Only creates the real pool when
- * a property is accessed.
- */
-export const pool: Pool = new Proxy({} as Pool, {
-  get(_target, prop, receiver) {
-    const p = getPool()
-    const value = Reflect.get(p, prop, receiver)
-    return typeof value === 'function' ? value.bind(p) : value
+/** Stateless connection (one-off queries). */
+export const pool = {
+  execute: async (sql: string, params: any[] = []) => {
+    return getConnection().execute(sql, params)
   },
-})
-
-export async function query<T = any>(sql: string, params: any[] = []): Promise<T> {
-  const [rows] = await getPool().query(sql, params)
-  return rows as T
+  query: async (sql: string, params: any[] = []) => {
+    return getConnection().execute(sql, params)
+  },
+  end: async () => {
+    // Stateless - nothing to close
+  },
 }
 
-export async function execute<T = ResultSetHeader>(sql: string, params: any[] = []): Promise<T> {
-  const [result] = await getPool().execute(sql, params)
+/**
+ * Execute a SELECT query and return rows.
+ * Returns array of rows directly (not wrapped in [rows, fields]).
+ */
+export async function query<T = any>(sql: string, params: any[] = []): Promise<T> {
+  const result = await getConnection().execute(sql, params)
+  // @tidbcloud/serverless returns { rows, ... } for SELECTs
+  return (result as any).rows ?? result as T
+}
+
+/**
+ * Execute an INSERT/UPDATE/DELETE.
+ */
+export async function execute<T = any>(sql: string, params: any[] = []): Promise<T> {
+  const result = await getConnection().execute(sql, params)
   return result as T
 }
 
+/**
+ * Transaction wrapper - uses TiDB serverless driver's interactive transaction.
+ *
+ * Usage:
+ *   const result = await transaction(async (tx) => {
+ *     await tx.execute('INSERT ...', [...])
+ *     await tx.execute('UPDATE ...', [...])
+ *     return { success: true }
+ *   })
+ */
 export async function transaction<T>(
-  fn: (conn: PoolConnection) => Promise<T>
+  fn: (tx: { execute: (sql: string, params?: any[]) => Promise<any> }) => Promise<T>
 ): Promise<T> {
-  const conn = await getPool().getConnection()
+  const conn = getConnection()
+  const tx = await conn.begin()
   try {
-    await conn.beginTransaction()
-    const result = await fn(conn)
-    await conn.commit()
+    const result = await fn({
+      execute: async (sql: string, params: any[] = []) => {
+        return tx.execute(sql, params)
+      },
+    })
+    await tx.commit()
     return result
   } catch (err) {
-    await conn.rollback()
+    await tx.rollback()
     throw err
-  } finally {
-    conn.release()
   }
 }
 

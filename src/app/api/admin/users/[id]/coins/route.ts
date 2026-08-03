@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { query, execute, transaction, generateId } from '@/lib/db'
+import { transaction, generateId } from '@/lib/db'
 import { verifyAdminRequest } from '@/lib/admin-auth'
 
 export async function POST(
@@ -17,16 +17,17 @@ export async function POST(
       return NextResponse.json({ message: 'COIN miqdori noto\'g\'ri' }, { status: 400 })
     }
 
-    await transaction(async (conn) => {
-      const [rows]: any = await conn.query('SELECT coinBalance FROM User WHERE id = ?', [id])
-      if (rows.length === 0) throw new Error('Foydalanuvchi topilmadi')
+    await transaction(async (tx) => {
+      const userRes: any = await tx.execute('SELECT coinBalance FROM User WHERE id = ?', [id])
+      const rows = userRes.rows || userRes
+      if (!rows || rows.length === 0) throw new Error('Foydalanuvchi topilmadi')
 
       const balanceBefore = Number(rows[0].coinBalance)
       const balanceAfter = coins
-      await conn.execute('UPDATE User SET coinBalance = ? WHERE id = ?', [coins, id])
+      await tx.execute('UPDATE User SET coinBalance = ? WHERE id = ?', [coins, id])
 
       const tId = generateId()
-      await conn.execute(
+      await tx.execute(
         `INSERT INTO Transaction (id, userId, type, amount, description, balanceBefore, balanceAfter, createdAt)
          VALUES (?, ?, 'admin_adjustment', ?, ?, ?, ?, NOW())`,
         [tId, id, balanceAfter - balanceBefore, 'Admin tomonidan balans tahrirlandi', balanceBefore, balanceAfter]
