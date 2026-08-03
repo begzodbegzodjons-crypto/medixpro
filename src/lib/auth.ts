@@ -2,6 +2,7 @@ import NextAuth, { type NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
+import { getCached, setCached, cacheKeys, TTL, invalidateCache } from '@/lib/cache'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,8 +17,18 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Email va parol talab qilinadi')
         }
 
+        const email = credentials.email.toLowerCase().trim()
+
         const user = await db.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            image: true,
+            password: true,
+            isBlocked: true,
+          },
         })
 
         if (!user) {
@@ -54,9 +65,6 @@ export const authOptions: NextAuthOptions = {
     signIn: '/sign-in',
   },
   // trustHost lets NextAuth auto-detect the host from request headers.
-  // This is critical when the app is served through a proxy / preview URL
-  // (e.g. preview-chat-XXX.space-z.ai) - it ensures cookies are set for the
-  // actual host the browser is using, not a hardcoded NEXTAUTH_URL.
   trustHost: true,
   cookies: {
     sessionToken: {
@@ -90,18 +98,60 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        const dbUser = await db.user.findUnique({ where: { id: user.id! } })
-        if (dbUser) {
-          token.coinBalance = dbUser.coinBalance
-          token.isAdmin = dbUser.isAdmin
-        }
-      } else if (token.id) {
-        // Refresh coin balance on each request
-        const dbUser = await db.user.findUnique({ where: { id: token.id as string } })
+        // On initial sign-in, fetch user data and cache it
+        const dbUser = await db.user.findUnique({
+          where: { id: user.id! },
+          select: {
+            id: true,
+            coinBalance: true,
+            isAdmin: true,
+            isBlocked: true,
+            name: true,
+            email: true,
+          },
+        })
         if (dbUser) {
           token.coinBalance = dbUser.coinBalance
           token.isAdmin = dbUser.isAdmin
           token.isBlocked = dbUser.isBlocked
+          // Cache for short TTL to avoid DB hit on every page load
+          setCached(cacheKeys.userCoinBalance(dbUser.id), {
+            coinBalance: dbUser.coinBalance,
+            isAdmin: dbUser.isAdmin,
+            isBlocked: dbUser.isBlocked,
+          }, TTL.SHORT)
+        }
+      } else if (token.id) {
+        // On subsequent requests, use cached data first
+        const userId = token.id as string
+        const cached = getCached<{ coinBalance: number; isAdmin: boolean; isBlocked: boolean }>(
+          cacheKeys.userCoinBalance(userId)
+        )
+
+        if (cached) {
+          token.coinBalance = cached.coinBalance
+          token.isAdmin = cached.isAdmin
+          token.isBlocked = cached.isBlocked
+        } else {
+          // Cache miss - fetch from DB and refresh cache
+          const dbUser = await db.user.findUnique({
+            where: { id: userId },
+            select: {
+              coinBalance: true,
+              isAdmin: true,
+              isBlocked: true,
+            },
+          })
+          if (dbUser) {
+            token.coinBalance = dbUser.coinBalance
+            token.isAdmin = dbUser.isAdmin
+            token.isBlocked = dbUser.isBlocked
+            setCached(cacheKeys.userCoinBalance(userId), {
+              coinBalance: dbUser.coinBalance,
+              isAdmin: dbUser.isAdmin,
+              isBlocked: dbUser.isBlocked,
+            }, TTL.SHORT)
+          }
         }
       }
       return token
@@ -116,6 +166,14 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET ?? 'ustoz-pro-dev-secret-change-me-in-production-32chars',
+  events: {
+    async signOut({ token }) {
+      // Clear cache on sign out
+      if (token?.id) {
+        invalidateCache(cacheKeys.userCoinBalance(token.id as string))
+      }
+    },
+  },
 }
 
 const handler = NextAuth(authOptions)

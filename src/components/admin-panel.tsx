@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { redeemAdminCode, redeemCoinPackage } from '@/app/actions'
+import { useState } from 'react'
+import { redeemAdminCode, redeemCoinPackage } from '@/lib/api'
 import { Key, AlertCircle, CheckCircle, Coins, ExternalLink, Lock } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -63,9 +63,9 @@ export default function AdminPanel() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Admin paneli</h2>
-        <p className="text-gray-600">Admin funktsiyalari va COIN paketlari</p>
+      <div className="mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Admin paneli</h2>
+        <p className="text-gray-600 text-sm md:text-base">Admin funktsiyalari va COIN paketlari</p>
       </div>
 
       {/* Success/Error message */}
@@ -89,8 +89,8 @@ export default function AdminPanel() {
       )}
 
       {/* Admin Code Redemption */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Admin kodini qo&apos;llantiring</h3>
+      <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+        <h3 className="text-base md:text-lg font-bold text-gray-900 mb-4">Admin kodini qo&apos;llantiring</h3>
 
         <form onSubmit={handleRedeemAdminCode} className="space-y-4">
           <div>
@@ -103,14 +103,14 @@ export default function AdminPanel() {
                 value={adminCode}
                 onChange={(e) => setAdminCode(e.target.value)}
                 placeholder="Admin kodini kiriting..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
               />
               <button
                 type="submit"
                 disabled={loading === 'admin' || !adminCode.trim()}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                className="px-4 md:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
               >
-                {loading === 'admin' ? "Qo'llanilmoqda..." : "Qo'llantiring"}
+                {loading === 'admin' ? '...' : "Qo'llash"}
               </button>
             </div>
           </div>
@@ -118,8 +118,8 @@ export default function AdminPanel() {
       </div>
 
       {/* COIN Package Redemption */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">COIN paket kodini qo&apos;llantiring</h3>
+      <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+        <h3 className="text-base md:text-lg font-bold text-gray-900 mb-4">COIN paket kodini qo&apos;llantiring</h3>
 
         <form onSubmit={handleRedeemCoinPackage} className="space-y-4">
           <div>
@@ -131,15 +131,15 @@ export default function AdminPanel() {
                 type="text"
                 value={coinCode}
                 onChange={(e) => setCoinCode(e.target.value)}
-                placeholder="COIN-XXXX-XXXX formatidagi kod..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+                placeholder="COIN-XXXX formatidagi kod..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 text-sm"
               />
               <button
                 type="submit"
                 disabled={loading === 'coin' || !coinCode.trim()}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                className="px-4 md:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-sm"
               >
-                {loading === 'coin' ? "Qo'llanilmoqda..." : "COIN olish"}
+                {loading === 'coin' ? '...' : 'COIN olish'}
               </button>
             </div>
           </div>
@@ -148,11 +148,11 @@ export default function AdminPanel() {
 
       {/* Admin Access to Full Panel */}
       {isAdmin && (
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-6 mb-6 text-white shadow-lg">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-4 md:p-6 mb-6 text-white shadow-lg">
           <div className="flex items-start gap-3 mb-4">
             <Lock className="w-6 h-6 text-blue-200 flex-shrink-0" />
             <div>
-              <h3 className="text-lg font-bold mb-2">To&apos;liq admin paneliga kirish</h3>
+              <h3 className="text-base md:text-lg font-bold mb-2">To&apos;liq admin paneliga kirish</h3>
               <p className="text-blue-100 text-sm">
                 Sizda admin huquqlari bor. To&apos;liq boshqaruv paneliga kirib, foydalanuvchilar, testlar,
                 materiallar, reklamalar va boshqalarni boshqarishingiz mumkin.
@@ -161,7 +161,7 @@ export default function AdminPanel() {
           </div>
           <button
             onClick={() => router.push('/admin-access?adminkod=access')}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-blue-700 rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-white text-blue-700 rounded-lg hover:bg-blue-50 transition-colors font-semibold text-sm"
           >
             <ExternalLink className="w-4 h-4" />
             To&apos;liq admin paneliga kirish
@@ -170,13 +170,13 @@ export default function AdminPanel() {
       )}
 
       {/* Info cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="bg-blue-50 rounded-lg p-4 md:p-6 border-2 border-blue-200">
           <div className="flex items-start gap-3">
             <Key className="w-6 h-6 text-blue-600 flex-shrink-0" />
             <div>
-              <h4 className="font-bold text-blue-900 mb-2">Admin funktsiyalari</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
+              <h4 className="font-bold text-blue-900 mb-2 text-sm md:text-base">Admin funktsiyalari</h4>
+              <ul className="text-xs md:text-sm text-blue-800 space-y-1">
                 <li>• Testlar yaratish va o&apos;zgartirish</li>
                 <li>• Materiallarni yuklash</li>
                 <li>• Foydalanuvchilar ma&apos;lumotlarini boshqarish</li>
@@ -187,12 +187,12 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+        <div className="bg-green-50 rounded-lg p-4 md:p-6 border-2 border-green-200">
           <div className="flex items-start gap-3">
             <Coins className="w-6 h-6 text-green-600 flex-shrink-0" />
             <div>
-              <h4 className="font-bold text-green-900 mb-2">COIN paketlari</h4>
-              <p className="text-sm text-green-800">
+              <h4 className="font-bold text-green-900 mb-2 text-sm md:text-base">COIN paketlari</h4>
+              <p className="text-xs md:text-sm text-green-800">
                 COIN paket kodlari orqali balansingizni to&apos;ldiring. Har bir kod faqat bir marta
                 ishlatiladi. Testdan o&apos;tib 50 COIN ham olishingiz mumkin.
               </p>

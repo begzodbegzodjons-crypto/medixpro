@@ -1,34 +1,36 @@
 /**
- * UstozPro - Database seed script
- * Creates: 11 subjects, sample tests for each subject, sample materials
- * Usage: bun run db:seed
+ * UstozPro - Database seed script (extended)
+ * Creates: 11 subjects, topics, tests, materials, lesson plans, lesson materials, COIN packages
  */
 import { db } from '../src/lib/db'
 import bcrypt from 'bcryptjs'
 
 async function main() {
-  console.log('🌱 Seeding database...')
+  console.log('🌱 Seeding database (extended)...')
 
-  // Clean up (order matters due to FK constraints)
+  // Clean up
   console.log('🧹 Cleaning existing data...')
+  await db.favorite.deleteMany()
   await db.library.deleteMany()
   await db.purchase.deleteMany()
   await db.transaction.deleteMany()
   await db.testResult.deleteMany()
+  await db.lessonPlan.deleteMany()
+  await db.lessonMaterial.deleteMany()
+  await db.topic.deleteMany()
   await db.adminCode.deleteMany()
   await db.coinPackage.deleteMany()
   await db.advertisement.deleteMany()
   await db.material.deleteMany()
   await db.test.deleteMany()
   await db.subject.deleteMany()
-  // Don't delete users - they have hashed passwords
 
-  // Create demo admin user (if not exists)
+  // Demo admin user
   const adminEmail = 'admin@ustozpro.uz'
-  const existingAdmin = await db.user.findUnique({ where: { email: adminEmail } })
-  if (!existingAdmin) {
+  let admin = await db.user.findUnique({ where: { email: adminEmail } })
+  if (!admin) {
     const hashedPassword = await bcrypt.hash('admin123', 10)
-    await db.user.create({
+    admin = await db.user.create({
       data: {
         email: adminEmail,
         name: 'Admin User',
@@ -37,23 +39,20 @@ async function main() {
         coinBalance: 1000,
       },
     })
-    console.log('👤 Created demo admin: admin@ustozpro.uz / admin123')
-  } else {
-    if (!existingAdmin.isAdmin) {
-      await db.user.update({
-        where: { id: existingAdmin.id },
-        data: { isAdmin: true },
-      })
-    }
-    console.log('👤 Demo admin already exists')
+    console.log('👤 Created demo admin')
+  } else if (!admin.isAdmin) {
+    admin = await db.user.update({
+      where: { id: admin.id },
+      data: { isAdmin: true },
+    })
   }
 
-  // Create demo regular user
+  // Demo user
   const userEmail = 'user@ustozpro.uz'
-  const existingUser = await db.user.findUnique({ where: { email: userEmail } })
-  if (!existingUser) {
+  let user = await db.user.findUnique({ where: { email: userEmail } })
+  if (!user) {
     const hashedPassword = await bcrypt.hash('user123', 10)
-    await db.user.create({
+    user = await db.user.create({
       data: {
         email: userEmail,
         name: 'Test Foydalanuvchi',
@@ -61,7 +60,6 @@ async function main() {
         coinBalance: 100,
       },
     })
-    console.log('👤 Created demo user: user@ustozpro.uz / user123')
   }
 
   // ==================== SUBJECTS ====================
@@ -87,9 +85,40 @@ async function main() {
   }
   console.log(`✅ Created ${createdSubjects.length} subjects`)
 
+  // ==================== TOPICS ====================
+  console.log('🔖 Creating topics...')
+  const topicsBySubject: Record<string, any[]> = {}
+
+  const topicsData: Record<string, string[]> = {
+    'Matematika': ['Natural sonlar', 'Kasrlar', 'Tenglamalar va tengsizliklar', 'Funksiyalar', 'Geometriya asoslari', 'Trigonometriya'],
+    'Fizika': ['Mexanika', 'Elektr va magnitmaydon', 'Termodinamika', 'Optika', 'Atom fizikasi'],
+    'Kimyo': ['Atom tuzilishi', 'Davriy sistem', 'Kimyoviy bog\'lar', 'Kislota va ishqorlar', 'Organik kimyo'],
+    'Biologiya': ['Hujayra', 'Genetika', 'Evolyutsiya', 'Ekologiya', 'Odam anatomiyasi'],
+    'Tarix': ['Qadimgi davlatlar', 'O\'rta asrlar', "O'zbekiston mustaqilligi", 'Jahon tarixi'],
+    'Geografiya': ['Tabiiy geografiya', 'Iqtisodiy geografiya', "O'zbekiston geografiyasi", 'Demografiya'],
+    'Adabiyot': ['Xalq og\'zaki ijodi', 'Klassik adabiyot', 'Zamonaviy adabiyot', 'Adabiyot nazariyasi'],
+    'Informatika': ['Algoritm', 'Dasturlash', 'Ma\'lumotlar bazasi', 'Kompyuter tarmoqlari', 'Web texnologiyalar'],
+  }
+
+  for (const subject of createdSubjects) {
+    const topicNames = topicsData[subject.name] || []
+    const created = []
+    for (let i = 0; i < topicNames.length; i++) {
+      const t = await db.topic.create({
+        data: {
+          subjectId: subject.id,
+          name: topicNames[i],
+          order: i,
+        },
+      })
+      created.push(t)
+    }
+    topicsBySubject[subject.id] = created
+  }
+  console.log('✅ Created topics')
+
   // ==================== TESTS ====================
   console.log('📝 Creating tests...')
-
   const buildTest = (
     subjectId: string,
     title: string,
@@ -203,59 +232,83 @@ async function main() {
     ),
   })
 
-  console.log('✅ Created sample tests for 6 subjects')
+  console.log('✅ Created sample tests')
 
   // ==================== MATERIALS ====================
-  console.log('📦 Creating sample materials...')
-
+  console.log('📦 Creating materials...')
   const materialsData = [
     {
       subjectId: createdSubjects[0].id,
       title: "Matematika - To'liq darslik (PDF)",
       description: "5-11 sinflar uchun matematika darsligining elektron versiyasi",
       fileUrl: 'https://example.com/math-textbook.pdf',
-      type: 'pdf' as const,
+      type: 'pdf',
       price: 100,
+      isFree: false,
     },
     {
       subjectId: createdSubjects[0].id,
-      title: "Algebra - Video darslar to'plami",
+      title: 'Algebra - Video darslar to\'plami',
       description: "Tenglamalar va tengsizliklar mavzusidagi video darslar",
       fileUrl: 'https://example.com/algebra-videos',
-      type: 'video' as const,
+      type: 'video',
       price: 150,
+      isFree: false,
     },
     {
       subjectId: createdSubjects[1].id,
       title: 'Fizika - Mexanika (PDF)',
       description: "Mexanika bo'limi bo'yicha to'liq qo'llanma",
       fileUrl: 'https://example.com/physics-mechanics.pdf',
-      type: 'pdf' as const,
+      type: 'pdf',
       price: 80,
+      isFree: false,
     },
     {
       subjectId: createdSubjects[2].id,
       title: 'Kimyo - Davriy sistem (PDF)',
       description: "Davriy sistem va elementlar haqida to'liq ma'lumot",
       fileUrl: 'https://example.com/chemistry-periodic.pdf',
-      type: 'pdf' as const,
+      type: 'pdf',
       price: 60,
+      isFree: false,
     },
     {
       subjectId: createdSubjects[3].id,
       title: 'Biologiya - Hujayra (Video)',
       description: "Hujayra tuzilishi haqida video dars",
       fileUrl: 'https://example.com/biology-cell-video',
-      type: 'video' as const,
+      type: 'video',
       price: 90,
+      isFree: false,
     },
     {
       subjectId: createdSubjects[9].id,
       title: 'Python dasturlash asoslari (PDF)',
       description: "Python tilini noldan o'rganish uchun qo'llanma",
       fileUrl: 'https://example.com/python-basics.pdf',
-      type: 'pdf' as const,
+      type: 'pdf',
       price: 120,
+      isFree: false,
+    },
+    // Free materials
+    {
+      subjectId: createdSubjects[0].id,
+      title: 'Matematika formulalari to\'plami (Bepul)',
+      description: "Asosiy matematika formulalari, har bir o'quvchiga kerak",
+      fileUrl: 'https://example.com/math-formulas.pdf',
+      type: 'pdf',
+      price: 0,
+      isFree: true,
+    },
+    {
+      subjectId: createdSubjects[1].id,
+      title: 'Fizika formulalari (Bepul)',
+      description: "Barcha asosiy fizika formulalari bir joyda",
+      fileUrl: 'https://example.com/physics-formulas.pdf',
+      type: 'pdf',
+      price: 0,
+      isFree: true,
     },
   ]
 
@@ -264,8 +317,313 @@ async function main() {
   }
   console.log(`✅ Created ${materialsData.length} materials`)
 
+  // ==================== LESSON PLANS ====================
+  console.log('📋 Creating lesson plans...')
+
+  const buildLessonPlanContent = (
+    objectives: string[],
+    materials: string[],
+    stages: { name: string; duration: number; description: string }[],
+    homework: string,
+    assessment: string,
+    notes?: string
+  ) => {
+    return JSON.stringify({
+      objectives,
+      materials,
+      stages,
+      homework,
+      assessment,
+      notes: notes || '',
+    })
+  }
+
+  const lessonPlansData = [
+    {
+      subjectId: createdSubjects[0].id,
+      topicId: topicsBySubject[createdSubjects[0].id]?.[2]?.id, // Tenglamalar
+      title: 'Tenglamalar va ularning yechimlari - 7-sinf',
+      description: 'Chiziqli tenglamalarni yechish metodikasi bo\'yicha to\'liq dars rejasi',
+      classLevel: 7,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['O\'quvchilar chiziqli tenglama tushunchasini tushunishlari', 'Tenglamani yechish qoidalarini bilib olish', 'Amaliy misollarni mustaqil yecha olish'],
+        ['Darslik', 'Doska', 'Ko\'rgazma materiallar', 'Test savollari'],
+        [
+          { name: 'Tashkiliy qism', duration: 5, description: 'O\'quvchilarni ro\'yxatga olish, darsga tayyorgarlik' },
+          { name: 'Yangi mavzu bayoni', duration: 15, description: 'Tenglama tushunchasi, uning yechimi va qoidalari' },
+          { name: 'Mustahkamlash', duration: 15, description: 'Darslikdagi misollarni yechish, mustaqil ish' },
+          { name: 'Xulosa va baholash', duration: 10, description: 'Darsni xulosalash, o\'quvchilarni baholash, uy vazifasi' },
+        ],
+        'Darslikning 45-betidagi 1-10 misollarni yechish',
+        'Amaliy ish va og\'zaki javoblar asosida baholash',
+        'Iqtidorli o\'quvchilar uchun qo\'shimcha murakkab misollar tayyorlang'
+      ),
+    },
+    {
+      subjectId: createdSubjects[0].id,
+      topicId: topicsBySubject[createdSubjects[0].id]?.[4]?.id,
+      title: 'Uchburchaklar geometriyasi - 8-sinf',
+      description: 'Uchburchak turlari va ularning xossalari haqida dars',
+      classLevel: 8,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['Uchburchak turlarini farqlash', 'Uchburchak xossalarini bilib olish', 'Pifagor teoremasini qo\'llay olish'],
+        ['Geometriya darsligi', 'Doska', 'Chizg\'ich va transportir', 'Uchburchaklar shakllari'],
+        [
+          { name: 'Tashkiliy qism', duration: 5, description: 'Salomlashish, davomatni aniqlash' },
+          { name: 'Takroriy mashg\'ot', duration: 10, description: 'Oldingi darsni takrorlash' },
+          { name: 'Yangi mavzu', duration: 15, description: 'Uchburchak turlari: teng yonli, teng tomonli, to\'g\'ri burchakli' },
+          { name: 'Mustahkamlash', duration: 15, description: 'Amaliy mashqlar va Pifagor teoremasini qo\'llash' },
+        ],
+        '45-bet 5-8 masalalar',
+        'Mustaqil ish asosida',
+      ),
+    },
+    {
+      subjectId: createdSubjects[1].id,
+      topicId: topicsBySubject[createdSubjects[1].id]?.[0]?.id,
+      title: 'Nyuton qonunlari - 9-sinf',
+      description: 'Mexanikaning asosiy qonunlari va ularning qo\'llanilishi',
+      classLevel: 9,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['Nyutonning 3 qonunini bilib olish', 'Harakat qonunlarini tahlil qila olish', 'Hayotiy misollar keltira olish'],
+        ['Fizika darsligi', 'Laboratoriya jihozlari', 'Video materiallar'],
+        [
+          { name: 'Kirish', duration: 5, description: 'Mavzuga oid savollar berish' },
+          { name: 'Mavzu bayoni', duration: 20, description: 'Nyutonning har bir qonunini tushuntirish va misol keltirish' },
+          { name: 'Laboratoriya ishi', duration: 15, description: 'Tajriba orqali qonunlarni ko\'rsatish' },
+          { name: 'Xulosa', duration: 5, description: 'Savol-javob va baholash' },
+        ],
+        '78-bet 1-6 masalalar',
+        'Laboratoriya ishi va og\'zaki javoblar',
+      ),
+    },
+    {
+      subjectId: createdSubjects[2].id,
+      topicId: topicsBySubject[createdSubjects[2].id]?.[1]?.id,
+      title: 'Davriy sistem - 8-sinf',
+      description: 'Mendeleyev davriy sistemasi haqida tushuncha',
+      classLevel: 8,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['Davriy sistem tuzilishini tushunish', 'Elementlarni joylashini bilib olish', 'Davrlar va guruhlar farqini bilish'],
+        ['Kimyo darsligi', 'Davriy sistem jadvali', 'Doska'],
+        [
+          { name: 'Tashkiliy qism', duration: 5, description: 'Davomatni aniqlash' },
+          { name: 'Yangi mavzu', duration: 20, description: 'Davriy sistem tarixi va tuzilishi' },
+          { name: 'Amaliy mashg\'ot', duration: 15, description: 'Elementlarni jadvalda topish mashqi' },
+          { name: 'Xulosa', duration: 5, description: 'Takroriy savollar' },
+        ],
+        '34-bet 2-5 mashqlar',
+        'Og\'zaki javoblar va amaliy mashg\'ot',
+      ),
+    },
+    {
+      subjectId: createdSubjects[3].id,
+      topicId: topicsBySubject[createdSubjects[3].id]?.[0]?.id,
+      title: 'Hujayra - Hayotning asosiy birligi (9-sinf)',
+      description: 'Hujayra tuzilishi, organellari va funksiyalari haqida to\'liq dars',
+      classLevel: 9,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['Hujayra nazariyasini bilib olish', 'Hujayra organellari va funksiyalarini farqlash', 'Mikroskopda hujayrani kuzata olish'],
+        ['Biologiya darsligi', 'Mikroskop', 'Hujayra modeli', 'Preparatlar'],
+        [
+          { name: 'Tashkiliy qism', duration: 5, description: 'Salomlashish' },
+          { name: 'Nazariy qism', duration: 20, description: 'Hujayra turlari va organellari' },
+          { name: 'Laboratoriya ishi', duration: 15, description: 'Mikroskopda hujayrani kuzatish' },
+          { name: 'Xulosa', duration: 5, description: 'Savol-javob' },
+        ],
+        '56-bet 1-4 savollar',
+        'Laboratoriya ishi',
+      ),
+    },
+    {
+      subjectId: createdSubjects[9].id,
+      topicId: topicsBySubject[createdSubjects[9].id]?.[1]?.id,
+      title: 'Python - O\'zgaruvchilar va ma\'lumot turlari',
+      description: 'Python dasturlash tilining asoslarini o\'rgatish',
+      classLevel: 10,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['Python sintaksisini bilib olish', 'O\'zgaruvchi e\'lon qila olish', 'Asosiy ma\'lumot turlarini farqlash'],
+        ['Kompyuter', 'Python o\'rnatilgan', 'Prezentatsiya'],
+        [
+          { name: 'Kirish', duration: 5, description: 'Python haqida umumiy ma\'lumot' },
+          { name: 'Amaliy dars', duration: 25, description: 'print(), input(), o\'zgaruvchilar bilan ishlash' },
+          { name: 'Mustaqil ish', duration: 10, description: 'Oddiy dastur yozish' },
+          { name: 'Xulosa', duration: 5, description: 'Savol-javob' },
+        ],
+        'Oddiy kalkulyator dasturini yozish',
+        'Amaliy dasturlar asosida',
+      ),
+    },
+    {
+      subjectId: createdSubjects[0].id,
+      topicId: topicsBySubject[createdSubjects[0].id]?.[1]?.id,
+      title: 'Kasrlar bilan amallar - 5-sinf',
+      description: 'Oddiy va o\'nli kasrlar ustida amallar',
+      classLevel: 5,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['Kasr tushunchasini tushunish', 'Oddiy kasrlarni qo\'shish va ayirish', 'O\'nli kasrga o\'tkazish'],
+        ['Darslik', 'Doska', 'Kalkulyator'],
+        [
+          { name: 'Tashkiliy qism', duration: 5, description: 'Salomlashish' },
+          { name: 'Mavzu bayoni', duration: 15, description: 'Kasrlar bilan amallar qoidalari' },
+          { name: 'Mustahkamlash', duration: 20, description: 'Misollar yechish' },
+          { name: 'Xulosa', duration: 5, description: 'Takrorlash' },
+        ],
+        '23-bet 1-8 misollar',
+        'Mustaqil ish',
+      ),
+    },
+    {
+      subjectId: createdSubjects[4].id,
+      topicId: topicsBySubject[createdSubjects[4].id]?.[2]?.id,
+      title: 'Mustaqillik - Tarix darsi',
+      description: 'O\'zbekiston mustaqillikka erishishi haqida dars',
+      classLevel: 9,
+      duration: 45,
+      authorId: admin.id,
+      isPublic: true,
+      content: buildLessonPlanContent(
+        ['Mustaqillik tushunchasini tushunish', 'O\'zbekiston mustaqillik tarixini bilish', 'Konstitutsiya ahamiyatini anglash'],
+        ['Tarix darsligi', 'Xarita', 'Tarixiy fotosuratlar'],
+        [
+          { name: 'Kirish', duration: 5, description: 'Oldingi darsni takrorlash' },
+          { name: 'Mavzu', duration: 20, description: '1991-yil voqealari, mustaqillik e\'lon qilinishi' },
+          { name: 'Munozara', duration: 15, description: 'Mustaqillik ahamiyati haqida muhokama' },
+          { name: 'Xulosa', duration: 5, description: 'Savol-javob' },
+        ],
+        'Konstitutsiyani o\'qib chiqish',
+        'Og\'zaki javoblar va insho',
+      ),
+    },
+  ]
+
+  for (const p of lessonPlansData) {
+    await db.lessonPlan.create({ data: p as any })
+  }
+  console.log(`✅ Created ${lessonPlansData.length} lesson plans`)
+
+  // ==================== LESSON MATERIALS ====================
+  console.log('📎 Creating lesson materials...')
+
+  const lessonMaterialsData = [
+    {
+      subjectId: createdSubjects[0].id,
+      topicId: topicsBySubject[createdSubjects[0].id]?.[2]?.id,
+      title: 'Tenglamalar - Prezentatsiya',
+      description: 'Chiziqli tenglamalar mavzusidagi dars uchun PowerPoint prezentatsiya',
+      fileUrls: JSON.stringify(['https://example.com/presentations/equations.pptx']),
+      type: 'presentation',
+      classLevel: 7,
+      authorId: admin.id,
+      isPublic: true,
+    },
+    {
+      subjectId: createdSubjects[0].id,
+      topicId: topicsBySubject[createdSubjects[0].id]?.[2]?.id,
+      title: 'Tenglamalar - Ish varaqi',
+      description: 'O\'quvchilar uchun mustaqil ish varaqi',
+      fileUrls: JSON.stringify(['https://example.com/worksheets/equations.pdf']),
+      type: 'worksheet',
+      classLevel: 7,
+      authorId: admin.id,
+      isPublic: true,
+    },
+    {
+      subjectId: createdSubjects[1].id,
+      topicId: topicsBySubject[createdSubjects[1].id]?.[0]?.id,
+      title: 'Nyuton qonunlari - Video dars',
+      description: 'Nyuton qonunlari mavzusidagi video dars (15 daqiqa)',
+      fileUrls: JSON.stringify(['https://example.com/videos/newton-laws.mp4']),
+      type: 'video',
+      classLevel: 9,
+      authorId: admin.id,
+      isPublic: true,
+    },
+    {
+      subjectId: createdSubjects[2].id,
+      topicId: topicsBySubject[createdSubjects[2].id]?.[1]?.id,
+      title: 'Davriy sistem - Prezentatsiya',
+      description: 'Davriy sistem tuzilishi haqida vizual material',
+      fileUrls: JSON.stringify(['https://example.com/presentations/periodic-table.pptx']),
+      type: 'presentation',
+      classLevel: 8,
+      authorId: admin.id,
+      isPublic: true,
+    },
+    {
+      subjectId: createdSubjects[3].id,
+      topicId: topicsBySubject[createdSubjects[3].id]?.[0]?.id,
+      title: 'Hujayra - Laboratoriya ishi',
+      description: 'Mikroskopda hujayrani kuzatish bo\'yicha yo\'riqnoma',
+      fileUrls: JSON.stringify(['https://example.com/labs/cell-lab.pdf']),
+      type: 'document',
+      classLevel: 9,
+      authorId: admin.id,
+      isPublic: true,
+    },
+    {
+      subjectId: createdSubjects[9].id,
+      topicId: topicsBySubject[createdSubjects[9].id]?.[1]?.id,
+      title: 'Python - Amaliy mashqlar',
+      description: 'Python dasturlash bo\'yicha amaliy mashqlar to\'plami',
+      fileUrls: JSON.stringify(['https://example.com/exercises/python-exercises.pdf']),
+      type: 'worksheet',
+      classLevel: 10,
+      authorId: admin.id,
+      isPublic: true,
+    },
+    {
+      subjectId: createdSubjects[9].id,
+      topicId: topicsBySubject[createdSubjects[9].id]?.[1]?.id,
+      title: 'Python - O\'zgaruvchilar video dars',
+      description: 'O\'zgaruvchilar va ma\'lumot turlari haqida video',
+      fileUrls: JSON.stringify(['https://example.com/videos/python-variables.mp4']),
+      type: 'video',
+      classLevel: 10,
+      authorId: admin.id,
+      isPublic: true,
+    },
+    {
+      subjectId: createdSubjects[4].id,
+      topicId: topicsBySubject[createdSubjects[4].id]?.[2]?.id,
+      title: 'Mustaqillik - Test savollari',
+      description: 'Mustaqillik mavzusi bo\'yicha test savollari to\'plami',
+      fileUrls: JSON.stringify(['https://example.com/tests/independence-test.pdf']),
+      type: 'test',
+      classLevel: 9,
+      authorId: admin.id,
+      isPublic: true,
+    },
+  ]
+
+  for (const m of lessonMaterialsData) {
+    await db.lessonMaterial.create({ data: m as any })
+  }
+  console.log(`✅ Created ${lessonMaterialsData.length} lesson materials`)
+
   // ==================== COIN PACKAGES ====================
-  console.log('💰 Creating sample COIN packages...')
+  console.log('💰 Creating COIN packages...')
   const packages = [
     { name: "Boshlang'ich paket", coins: 100, code: 'COIN-START100' },
     { name: 'Standart paket', coins: 500, code: 'COIN-STD500' },
@@ -283,24 +641,17 @@ async function main() {
       },
     })
   }
-  console.log(`✅ Created ${packages.length} COIN packages`)
 
   // ==================== ADMIN CODES ====================
-  console.log('🔑 Creating admin codes...')
-  const admin = await db.user.findUnique({ where: { email: adminEmail } })
-  if (admin) {
-    await db.adminCode.create({
-      data: {
-        code: 'USTOZ-ADMIN2024',
-        type: 'admin',
-        createdById: admin.id,
-      },
-    })
-    console.log('✅ Created admin code: USTOZ-ADMIN2024')
-  }
+  await db.adminCode.create({
+    data: {
+      code: 'USTOZ-ADMIN2024',
+      type: 'admin',
+      createdById: admin.id,
+    },
+  })
 
   // ==================== ADVERTISEMENTS ====================
-  console.log('📢 Creating sample ads...')
   await db.advertisement.create({
     data: {
       title: 'Yangi matematika darsligi chiqdi!',
@@ -317,12 +668,11 @@ async function main() {
   console.log('   Admin:   admin@ustozpro.uz / admin123')
   console.log('   User:    user@ustozpro.uz / user123')
   console.log('\n🔑 Admin codes:')
-  console.log('   Admin code:  USTOZ-ADMIN2024 (use in "Admin" tab)')
+  console.log('   Admin code:  USTOZ-ADMIN2024')
   console.log('   Admin panel password: Balandtoglar1')
-  console.log('\n💰 COIN packages (test codes):')
-  packages.forEach((p) => {
-    console.log(`   ${p.code} → ${p.coins} COIN`)
-  })
+  console.log('\n💰 COIN packages:')
+  packages.forEach((p) => console.log(`   ${p.code} → ${p.coins} COIN`))
+  console.log(`\n📊 Totals: ${createdSubjects.length} subjects, ${lessonPlansData.length} lesson plans, ${lessonMaterialsData.length} lesson materials`)
 }
 
 main()

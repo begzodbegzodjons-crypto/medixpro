@@ -9,8 +9,22 @@ import Marketplace from './marketplace'
 import Library from './library'
 import Stats from './stats'
 import AdminPanel from './admin-panel'
+import LessonPlans from './lesson-plans'
+import LessonMaterials from './lesson-materials'
+import Favorites from './favorites'
+import SearchView from './search-view'
 
-type Tab = 'home' | 'tests' | 'marketplace' | 'library' | 'stats' | 'admin'
+type Tab =
+  | 'home'
+  | 'tests'
+  | 'marketplace'
+  | 'library'
+  | 'stats'
+  | 'admin'
+  | 'lesson-plans'
+  | 'lesson-materials'
+  | 'favorites'
+  | 'search'
 
 export default function Dashboard({ userId }: { userId: string }) {
   const [activeTab, setActiveTab] = useState<Tab>('home')
@@ -38,9 +52,21 @@ export default function Dashboard({ userId }: { userId: string }) {
         return <Stats />
       case 'admin':
         return isAdmin ? <AdminPanel /> : <SubjectGrid />
+      case 'lesson-plans':
+        return <LessonPlans />
+      case 'lesson-materials':
+        return <LessonMaterials />
+      case 'favorites':
+        return <Favorites />
+      case 'search':
+        return <SearchView />
       default:
         return <SubjectGrid />
     }
+  }
+
+  const handleSearch = () => {
+    setActiveTab('search')
   }
 
   return (
@@ -49,6 +75,7 @@ export default function Dashboard({ userId }: { userId: string }) {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isAdmin={isAdmin}
+        onSearch={handleSearch}
       />
       <main className="max-w-7xl mx-auto px-4 py-8">
         {renderContent()}

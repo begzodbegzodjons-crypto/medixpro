@@ -1,5 +1,5 @@
 // UstozPro - Prisma schema (SQLite)
-// O'qituvchilar uchun professional ta'lim platformasi
+// O'qituvchilar uchun professional ta'lim platformasi - kengaytirilgan versiya
 
 generator client {
   provider = "prisma-client-js"
@@ -24,17 +24,26 @@ model User {
   lastTestDate        String?
   isAdmin             Boolean  @default(false)
   isBlocked           Boolean  @default(false)
+  // Teacher-specific
+  subject             String? // Main teaching subject
+  school              String? // School name
+  district            String? // Tuman/shahar
+  bio                 String?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
-  testResults   TestResult[]
-  transactions  Transaction[]
-  purchases     Purchase[]
-  library       Library[]
-  accounts      Account[]
-  sessions      Session[]
-  createdCodes  AdminCode[]   @relation("AdminCodeCreator")
-  redeemedCodes AdminCode[]   @relation("AdminCodeRedeemer")
+  testResults      TestResult[]
+  transactions     Transaction[]
+  purchases        Purchase[]
+  library          Library[]
+  favorites        Favorite[]
+  lessonPlans      LessonPlan[]      @relation("LessonPlanAuthor")
+  lessonMaterials  LessonMaterial[] @relation("LessonMaterialAuthor")
+  notifications    Notification[]
+  accounts         Account[]
+  sessions         Session[]
+  createdCodes     AdminCode[]   @relation("AdminCodeCreator")
+  redeemedCodes    AdminCode[]   @relation("AdminCodeRedeemer")
 }
 
 model Account {
@@ -53,6 +62,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -61,6 +71,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -72,15 +84,33 @@ model VerificationToken {
 }
 
 model Subject {
-  id        String   @id @default(cuid())
-  name      String
-  icon      String?
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String
+  icon        String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  tests      Test[]
-  materials  Material[]
+  tests           Test[]
+  materials       Material[]
+  topics          Topic[]
+  lessonPlans     LessonPlan[]
+  lessonMaterials LessonMaterial[]
+}
+
+model Topic {
+  id          String   @id @default(cuid())
+  subjectId   String
+  name        String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  subject          Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  lessonPlans      LessonPlan[]
+  lessonMaterials  LessonMaterial[]
+
+  @@index([subjectId])
 }
 
 model Test {
@@ -99,6 +129,9 @@ model Test {
 
   subject      Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   testResults  TestResult[]
+
+  @@index([subjectId])
+  @@index([createdAt])
 }
 
 model TestResult {
@@ -116,6 +149,7 @@ model TestResult {
 
   @@index([userId])
   @@index([testId])
+  @@index([createdAt])
 }
 
 model Transaction {
@@ -131,6 +165,7 @@ model Transaction {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([createdAt])
 }
 
 model Material {
@@ -139,14 +174,21 @@ model Material {
   title       String
   description String?
   fileUrl     String
-  type        String // 'pdf', 'video'
+  type        String // 'pdf', 'video', 'document', 'presentation'
   price       Float   @default(0)
+  // Free materials available to all teachers
+  isFree      Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   subject    Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   purchases  Purchase[]
   library    Library[]
+  favorites  Favorite[]
+
+  @@index([subjectId])
+  @@index([createdAt])
+  @@index([isFree])
 }
 
 model Purchase {
@@ -160,6 +202,7 @@ model Purchase {
   material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
 
   @@unique([userId, materialId])
+  @@index([userId])
 }
 
 model Library {
@@ -172,6 +215,78 @@ model Library {
   material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
 
   @@unique([userId, materialId])
+  @@index([userId])
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  materialId String
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, materialId])
+  @@index([userId])
+}
+
+// Dars ish rejalari - Lesson plans
+model LessonPlan {
+  id          String   @id @default(cuid())
+  subjectId   String
+  topicId     String?
+  title       String
+  description String?
+  // JSON-encoded structured content
+  // { objectives, materials, stages, homework, assessment }
+  content     String
+  // Class level: 5, 6, 7, 8, 9, 10, 11
+  classLevel  Int?
+  // Lesson duration in minutes
+  duration    Int      @default(45)
+  // Author
+  authorId    String?
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  topic   Topic?  @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  author  User?   @relation("LessonPlanAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([subjectId])
+  @@index([topicId])
+  @@index([classLevel])
+  @@index([createdAt])
+}
+
+// Dars ishlanmalari - Lesson materials (teaching resources)
+model LessonMaterial {
+  id          String   @id @default(cuid())
+  subjectId   String
+  topicId     String?
+  title       String
+  description String?
+  // JSON-encoded list of file URLs
+  fileUrls    String
+  // Material type: 'presentation', 'worksheet', 'test', 'video', 'document'
+  type        String
+  classLevel  Int?
+  authorId    String?
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  topic   Topic?  @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  author  User?   @relation("LessonMaterialAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([subjectId])
+  @@index([topicId])
+  @@index([classLevel])
+  @@index([type])
+  @@index([createdAt])
 }
 
 model AdminCode {
@@ -208,6 +323,25 @@ model Advertisement {
   link        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([position])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info") // info, success, warning, error
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
 }
 
 model Setting {

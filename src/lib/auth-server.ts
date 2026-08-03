@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
+import { invalidateCache, cacheKeys } from '@/lib/cache'
 
 export async function getSession() {
   return getServerSession(authOptions)
@@ -33,6 +34,23 @@ export async function verifyPassword(password: string, hashedPassword: string) {
 }
 
 /**
+ * Update user's coin balance and invalidate the cached balance.
+ * Use this for any balance-changing operation (purchases, rewards, redemptions).
+ */
+export async function updateUserCoins(
+  userId: string,
+  newBalance: number,
+  options?: { balanceBefore?: number; balanceAfter?: number }
+) {
+  await db.user.update({
+    where: { id: userId },
+    data: { coinBalance: newBalance },
+  })
+  // Invalidate cached balance so next session check fetches fresh value
+  invalidateCache(cacheKeys.userCoinBalance(userId))
+}
+
+/**
  * Sign up a new user with email/password
  */
 export async function createUser({
@@ -44,8 +62,9 @@ export async function createUser({
   password: string
   name?: string
 }) {
+  const normalizedEmail = email.toLowerCase().trim()
   const existing = await db.user.findUnique({
-    where: { email: email.toLowerCase() },
+    where: { email: normalizedEmail },
   })
   if (existing) {
     throw new Error('Bu email allaqachon ro\'yxatdan o\'tgan')
@@ -54,9 +73,9 @@ export async function createUser({
   const hashedPassword = await hashPassword(password)
   const user = await db.user.create({
     data: {
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       password: hashedPassword,
-      name,
+      name: name?.trim() || null,
     },
   })
 
