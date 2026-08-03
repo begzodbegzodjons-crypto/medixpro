@@ -7,5 +7,5 @@ assets = { directory = ".open-next/assets", binding = "ASSETS" }
 [observability]
 enabled = true
 
-[vars]
-NEXTAUTH_URL = "https://ustoz-pro.pages.dev"
+# NEXTAUTH_URL should be set as an environment variable in Cloudflare dashboard
+# Workers deploy URL pattern: https://<project-name>.<account-name>.workers.dev
