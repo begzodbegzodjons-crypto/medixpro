@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { query } from '@/lib/db'
 import { verifyAdminRequest } from '@/lib/admin-auth'
 
 export async function GET(request: Request) {
@@ -8,21 +8,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     }
 
-    const [totalUsers, totalSubjects, totalTests, totalMaterials, activeCoinPackages] =
-      await Promise.all([
-        db.user.count(),
-        db.subject.count(),
-        db.test.count(),
-        db.material.count(),
-        db.coinPackage.count({ where: { isActive: true } }),
-      ])
+    const [users, subjects, tests, materials, packages] = await Promise.all([
+      query<any[]>('SELECT COUNT(*) as cnt FROM User'),
+      query<any[]>('SELECT COUNT(*) as cnt FROM Subject'),
+      query<any[]>('SELECT COUNT(*) as cnt FROM Test'),
+      query<any[]>('SELECT COUNT(*) as cnt FROM Material'),
+      query<any[]>('SELECT COUNT(*) as cnt FROM CoinPackage WHERE isActive = 1'),
+    ])
 
     return NextResponse.json({
-      totalUsers,
-      totalSubjects,
-      totalTests,
-      totalMaterials,
-      activeCoinPackages,
+      totalUsers: Number(users[0]?.cnt || 0),
+      totalSubjects: Number(subjects[0]?.cnt || 0),
+      totalTests: Number(tests[0]?.cnt || 0),
+      totalMaterials: Number(materials[0]?.cnt || 0),
+      activeCoinPackages: Number(packages[0]?.cnt || 0),
     })
   } catch (error) {
     console.error('[admin] stats error:', error)

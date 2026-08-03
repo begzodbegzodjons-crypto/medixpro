@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { execute } from '@/lib/db'
 import { verifyAdminRequest } from '@/lib/admin-auth'
 import { hashPassword } from '@/lib/auth-server'
 
@@ -11,7 +11,6 @@ export async function POST(
     if (!verifyAdminRequest(request.headers.get('Authorization'))) {
       return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     }
-
     const { id } = await params
     const { password } = await request.json()
 
@@ -23,11 +22,7 @@ export async function POST(
     }
 
     const hashed = await hashPassword(password)
-
-    await db.user.update({
-      where: { id },
-      data: { password: hashed },
-    })
+    await execute('UPDATE User SET password = ?, updatedAt = NOW() WHERE id = ?', [hashed, id])
 
     return NextResponse.json({ id, message: "Parol o'zgartirildi" })
   } catch (error) {

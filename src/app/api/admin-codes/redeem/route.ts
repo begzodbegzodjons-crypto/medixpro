@@ -1,57 +1,42 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { transaction, generateId } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth-server'
-import { invalidatePattern } from '@/lib/cache'
+import { invalidateCache, cacheKeys } from '@/lib/cache'
 
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser()
     if (!user?.id) {
-      return NextResponse.json(
-        { message: 'Avtorizatsiya talab qilinadi' },
-        { status: 401 }
-      )
+      return NextResponse.json({ message: 'Avtorizatsiya talab qilinadi' }, { status: 401 })
     }
 
     const { code } = await request.json()
     if (!code) {
-      return NextResponse.json(
-        { message: 'Kod talab qilinadi' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Kod talab qilinadi' }, { status: 400 })
     }
 
-    const result = await db.$transaction(async (tx) => {
-      const adminCode = await tx.adminCode.findUnique({
-        where: { code: String(code).trim().toUpperCase() },
-      })
+    const result = await transaction(async (conn) => {
+      const [rows]: any = await conn.query(
+        'SELECT id, code, type, isUsed FROM AdminCode WHERE code = ?',
+        [String(code).trim().toUpperCase()]
+      )
+      if (rows.length === 0) throw new Error('Noto\'g\'ri kod')
+      const adminCode = rows[0]
+      if (Boolean(adminCode.isUsed)) throw new Error('Bu kod allaqachon ishlatilgan')
 
-      if (!adminCode) throw new Error('Noto\'g\'ri kod')
-      if (adminCode.isUsed) throw new Error('Bu kod allaqachon ishlatilgan')
+      await conn.execute(
+        'UPDATE AdminCode SET isUsed = 1, usedById = ?, usedAt = NOW() WHERE id = ?',
+        [user.id, adminCode.id]
+      )
 
-      // Update code as used
-      await tx.adminCode.update({
-        where: { id: adminCode.id },
-        data: {
-          isUsed: true,
-          usedById: user.id,
-          usedAt: new Date(),
-        },
-      })
-
-      // Grant permissions based on code type
       if (adminCode.type === 'admin') {
-        await tx.user.update({
-          where: { id: user.id },
-          data: { isAdmin: true },
-        })
+        await conn.execute('UPDATE User SET isAdmin = 1 WHERE id = ?', [user.id])
       }
 
       return { type: adminCode.type }
     })
 
-    // Invalidate cached balance and user data
-    invalidatePattern(`user:coins:${user.id}`)
+    invalidateCache(cacheKeys.userCoinBalance(user.id))
 
     return NextResponse.json({ success: true, type: result.type })
   } catch (error) {

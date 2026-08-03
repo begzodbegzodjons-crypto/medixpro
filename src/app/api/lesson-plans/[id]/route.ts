@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { query } from '@/lib/db'
 
 export async function GET(
   request: Request,
@@ -8,39 +8,40 @@ export async function GET(
   try {
     const { id } = await params
 
-    const plan = await db.lessonPlan.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        content: true,
-        classLevel: true,
-        duration: true,
-        createdAt: true,
-        updatedAt: true,
-        subject: { select: { id: true, name: true, icon: true } },
-        topic: { select: { id: true, name: true } },
-        author: { select: { id: true, name: true } },
-      },
-    })
+    const rows = await query<any[]>(
+      `SELECT lp.id, lp.title, lp.description, lp.content, lp.classLevel, lp.duration,
+              lp.createdAt, lp.updatedAt,
+              s.id AS subjectId, s.name AS subjectName, s.icon AS subjectIcon,
+              tp.id AS topicId, tp.name AS topicName,
+              u.id AS authorId, u.name AS authorName
+       FROM LessonPlan lp
+       LEFT JOIN Subject s ON s.id = lp.subjectId
+       LEFT JOIN Topic tp ON tp.id = lp.topicId
+       LEFT JOIN User u ON u.id = lp.authorId
+       WHERE lp.id = ?`,
+      [id]
+    )
 
-    if (!plan) {
-      return NextResponse.json(
-        { message: 'Dars rejasi topilmadi' },
-        { status: 404 }
-      )
+    if (rows.length === 0) {
+      return NextResponse.json({ message: 'Dars rejasi topilmadi' }, { status: 404 })
     }
 
+    const p = rows[0]
     return NextResponse.json({
-      ...plan,
-      content: JSON.parse(plan.content),
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      content: JSON.parse(p.content),
+      classLevel: p.classLevel,
+      duration: p.duration,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+      subject: { id: p.subjectId, name: p.subjectName, icon: p.subjectIcon },
+      topic: p.topicId ? { id: p.topicId, name: p.topicName } : null,
+      author: p.authorId ? { id: p.authorId, name: p.authorName } : null,
     })
   } catch (error) {
     console.error('[api/lesson-plans/[id]] error:', error)
-    return NextResponse.json(
-      { message: 'Server xatosi' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Server xatosi' }, { status: 500 })
   }
 }

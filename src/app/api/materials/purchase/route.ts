@@ -1,115 +1,80 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getCurrentUser, updateUserCoins } from '@/lib/auth-server'
-import { invalidatePattern } from '@/lib/cache'
+import { query, transaction, generateId } from '@/lib/db'
+import { getCurrentUser } from '@/lib/auth-server'
+import { invalidateCache, cacheKeys } from '@/lib/cache'
 
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser()
     if (!user?.id) {
-      return NextResponse.json(
-        { message: 'Avtorizatsiya talab qilinadi' },
-        { status: 401 }
-      )
+      return NextResponse.json({ message: 'Avtorizatsiya talab qilinadi' }, { status: 401 })
     }
 
     const { materialId } = await request.json()
     if (!materialId) {
-      return NextResponse.json(
-        { message: 'Material ID talab qilinadi' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Material ID talab qilinadi' }, { status: 400 })
     }
 
-    // Atomic transaction: check + deduct + record + add to library
-    const result = await db.$transaction(async (tx) => {
-      const material = await tx.material.findUnique({
-        where: { id: materialId },
-      })
-      if (!material) throw new Error('Material topilmadi')
+    const result = await transaction(async (conn) => {
+      const [mats]: any = await conn.query('SELECT id, title, price, isFree FROM Material WHERE id = ?', [materialId])
+      if (mats.length === 0) throw new Error('Material topilmadi')
+      const material = mats[0]
+      const price = Number(material.price)
 
-      // Check if already purchased
-      const existing = await tx.purchase.findUnique({
-        where: {
-          userId_materialId: { userId: user.id, materialId },
-        },
-      })
-      if (existing) throw new Error('Siz allaqachon sotib olgansiz')
+      // Already purchased?
+      const [existing]: any = await conn.query(
+        'SELECT id FROM Purchase WHERE userId = ? AND materialId = ?',
+        [user.id, materialId]
+      )
+      if (existing.length > 0) throw new Error('Siz allaqachon sotib olgansiz')
 
-      // Free materials can be "purchased" without COIN
-      if (material.isFree || material.price === 0) {
-        await tx.purchase.create({
-          data: {
-            userId: user.id,
-            materialId,
-            price: 0,
-          },
-        })
-        await tx.library.create({
-          data: {
-            userId: user.id,
-            materialId,
-          },
-        })
+      // Free material
+      if (Boolean(material.isFree) || price === 0) {
+        const pId = generateId()
+        await conn.execute(
+          'INSERT INTO Purchase (id, userId, materialId, price, createdAt) VALUES (?, ?, ?, 0, NOW())',
+          [pId, user.id, materialId]
+        )
+        const lId = generateId()
+        await conn.execute(
+          'INSERT INTO Library (id, userId, materialId, createdAt) VALUES (?, ?, ?, NOW())',
+          [lId, user.id, materialId]
+        )
         return { success: true, price: 0, title: material.title }
       }
 
-      // Check balance
-      const currentUser = await tx.user.findUnique({
-        where: { id: user.id },
-        select: { coinBalance: true },
-      })
-      if (!currentUser) throw new Error('Foydalanuvchi topilmadi')
-
-      const currentBalance = currentUser.coinBalance
-      if (currentBalance < material.price) {
-        throw new Error(
-          `COIN yetarli emas. Sizda ${currentBalance} COIN bor, kerak ${material.price}`
-        )
+      // Paid: check balance
+      const [users]: any = await conn.query('SELECT coinBalance FROM User WHERE id = ?', [user.id])
+      if (users.length === 0) throw new Error('Foydalanuvchi topilmadi')
+      const currentBalance = Number(users[0].coinBalance)
+      if (currentBalance < price) {
+        throw new Error(`COIN yetarli emas. Sizda ${currentBalance} COIN bor, kerak ${price}`)
       }
+      const balanceAfter = currentBalance - price
 
-      const balanceAfter = currentBalance - material.price
+      await conn.execute('UPDATE User SET coinBalance = ? WHERE id = ?', [balanceAfter, user.id])
 
-      // Deduct coins
-      await tx.user.update({
-        where: { id: user.id },
-        data: { coinBalance: balanceAfter },
-      })
+      const pId = generateId()
+      await conn.execute(
+        'INSERT INTO Purchase (id, userId, materialId, price, createdAt) VALUES (?, ?, ?, ?, NOW())',
+        [pId, user.id, materialId, price]
+      )
+      const lId = generateId()
+      await conn.execute(
+        'INSERT INTO Library (id, userId, materialId, createdAt) VALUES (?, ?, ?, NOW())',
+        [lId, user.id, materialId]
+      )
+      const tId = generateId()
+      await conn.execute(
+        `INSERT INTO Transaction (id, userId, type, amount, description, balanceBefore, balanceAfter, createdAt)
+         VALUES (?, ?, 'purchase', ?, ?, ?, ?, NOW())`,
+        [tId, user.id, -price, `Sotib olindi: ${material.title}`, currentBalance, balanceAfter]
+      )
 
-      // Record purchase
-      await tx.purchase.create({
-        data: {
-          userId: user.id,
-          materialId,
-          price: material.price,
-        },
-      })
-
-      // Add to library
-      await tx.library.create({
-        data: {
-          userId: user.id,
-          materialId,
-        },
-      })
-
-      // Record transaction
-      await tx.transaction.create({
-        data: {
-          userId: user.id,
-          type: 'purchase',
-          amount: -material.price,
-          description: `Sotib olindi: ${material.title}`,
-          balanceBefore: currentBalance,
-          balanceAfter,
-        },
-      })
-
-      return { success: true, price: material.price, title: material.title, balanceAfter }
+      return { success: true, price, title: material.title, balanceAfter }
     })
 
-    // Invalidate user coin balance cache
-    invalidatePattern(`user:coins:${user.id}`)
+    invalidateCache(cacheKeys.userCoinBalance(user.id))
 
     return NextResponse.json(result)
   } catch (error) {

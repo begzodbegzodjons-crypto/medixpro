@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { query, execute, generateId } from '@/lib/db'
 import { verifyAdminRequest } from '@/lib/admin-auth'
 
 export async function GET(request: Request) {
@@ -7,13 +7,19 @@ export async function GET(request: Request) {
     if (!verifyAdminRequest(request.headers.get('Authorization'))) {
       return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     }
-
-    const tests = await db.test.findMany({
-      include: { subject: true },
-      orderBy: { createdAt: 'desc' },
-    })
-
-    return NextResponse.json(tests)
+    const tests = await query<any[]>(
+      `SELECT t.id, t.subjectId, t.title, t.description, t.passingScore, t.timeLimit, t.createdAt, t.updatedAt,
+              s.id AS subjectId, s.name AS subjectName
+       FROM Test t
+       LEFT JOIN Subject s ON s.id = t.subjectId
+       ORDER BY t.createdAt DESC`
+    )
+    return NextResponse.json(
+      tests.map((t) => ({
+        ...t,
+        subject: { id: t.subjectId, name: t.subjectName },
+      }))
+    )
   } catch (error) {
     console.error('[admin] tests GET error:', error)
     return NextResponse.json({ message: 'Server xatosi' }, { status: 500 })
@@ -25,7 +31,6 @@ export async function POST(request: Request) {
     if (!verifyAdminRequest(request.headers.get('Authorization'))) {
       return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     }
-
     const body = await request.json()
     const { subjectId, title, description, questions, correctAnswers, passingScore, timeLimit } = body
 
@@ -35,36 +40,21 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
-
-    // questions: array of { id, text, options[] }
-    // correctAnswers: array of strings (one correct option per question, same index)
     if (!Array.isArray(questions) || !Array.isArray(correctAnswers)) {
-      return NextResponse.json(
-        { message: 'Savollar va javoblar massiv bo\'lishi kerak' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Savollar va javoblar massiv bo\'lishi kerak' }, { status: 400 })
     }
-
     if (questions.length !== correctAnswers.length) {
-      return NextResponse.json(
-        { message: 'Savollar va javoblar soni teng bo\'lishi kerak' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Savollar va javoblar soni teng bo\'lishi kerak' }, { status: 400 })
     }
 
-    const test = await db.test.create({
-      data: {
-        subjectId,
-        title,
-        description: description || null,
-        questions: JSON.stringify(questions),
-        correctAnswers: JSON.stringify(correctAnswers),
-        passingScore: passingScore ?? 60,
-        timeLimit: timeLimit ?? null,
-      },
-    })
+    const id = generateId()
+    await execute(
+      `INSERT INTO Test (id, subjectId, title, description, questions, correctAnswers, passingScore, timeLimit, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [id, subjectId, title, description || null, JSON.stringify(questions), JSON.stringify(correctAnswers), passingScore ?? 60, timeLimit ?? null]
+    )
 
-    return NextResponse.json(test)
+    return NextResponse.json({ id, subjectId, title, description, questions, correctAnswers, passingScore: passingScore ?? 60, timeLimit: timeLimit ?? null })
   } catch (error) {
     console.error('[admin] tests POST error:', error)
     return NextResponse.json({ message: 'Server xatosi' }, { status: 500 })

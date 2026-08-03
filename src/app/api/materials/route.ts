@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { query } from '@/lib/db'
 
 export async function GET(request: Request) {
   try {
@@ -12,53 +12,61 @@ export async function GET(request: Request) {
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 50)
     const skip = (page - 1) * limit
 
-    const where: any = {}
-    if (subjectId) where.subjectId = subjectId
-    if (type) where.type = type
-    if (isFree === 'true') where.isFree = true
-    if (search) {
-      where.OR = [
-        { title: { contains: search } },
-        { description: { contains: search } },
-      ]
+    const where: string[] = []
+    const values: any[] = []
+    if (subjectId) {
+      where.push('m.subjectId = ?')
+      values.push(subjectId)
     }
+    if (type) {
+      where.push('m.type = ?')
+      values.push(type)
+    }
+    if (isFree === 'true') {
+      where.push('m.isFree = 1')
+    }
+    if (search) {
+      where.push('(m.title LIKE ? OR m.description LIKE ?)')
+      values.push(`%${search}%`, `%${search}%`)
+    }
+    const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : ''
 
-    const [materials, total] = await Promise.all([
-      db.material.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          fileUrl: true,
-          type: true,
-          price: true,
-          isFree: true,
-          createdAt: true,
-          subject: { select: { id: true, name: true } },
-        },
-      }),
-      db.material.count({ where }),
+    const [mats, totalRows] = await Promise.all([
+      query<any[]>(
+        `SELECT m.id, m.title, m.description, m.fileUrl, m.type, m.price, m.isFree, m.createdAt,
+                s.id AS subjectId, s.name AS subjectName
+         FROM Material m
+         LEFT JOIN Subject s ON s.id = m.subjectId
+         ${whereSql}
+         ORDER BY m.createdAt DESC
+         LIMIT ? OFFSET ?`,
+        [...values, limit, skip]
+      ),
+      query<any[]>(`SELECT COUNT(*) as cnt FROM Material m ${whereSql}`, values),
     ])
 
+    const total = Number(totalRows[0]?.cnt || 0)
+
     return NextResponse.json({
-      items: materials,
+      items: mats.map((m) => ({
+        id: m.id,
+        title: m.title,
+        description: m.description,
+        fileUrl: m.fileUrl,
+        type: m.type,
+        price: Number(m.price),
+        isFree: Boolean(m.isFree),
+        createdAt: m.createdAt,
+        subject: { id: m.subjectId, name: m.subjectName },
+      })),
       pagination: {
-        page,
-        limit,
-        total,
+        page, limit, total,
         totalPages: Math.ceil(total / limit),
         hasMore: page * limit < total,
       },
     })
   } catch (error) {
     console.error('[api/materials] error:', error)
-    return NextResponse.json(
-      { message: 'Server xatosi' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Server xatosi' }, { status: 500 })
   }
 }

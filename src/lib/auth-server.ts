@@ -1,8 +1,10 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
-import { db } from '@/lib/db'
+import { query, execute, generateId } from '@/lib/db'
+import type { UserRow } from '@/lib/db-types'
 import { invalidateCache, cacheKeys } from '@/lib/cache'
+import { toBool } from '@/lib/db-types'
 
 export async function getSession() {
   return getServerSession(authOptions)
@@ -33,16 +35,28 @@ export async function verifyPassword(password: string, hashedPassword: string) {
   return bcrypt.compare(password, hashedPassword)
 }
 
-/**
- * Invalidate cached user data after balance changes.
- */
 export async function invalidateUserCache(userId: string) {
   invalidateCache(cacheKeys.userCoinBalance(userId))
 }
 
 /**
- * Sign up a new user with email/password
+ * Fetch user by ID with coin balance, isAdmin, isBlocked (cached briefly).
  */
+export async function fetchUserSessionData(userId: string) {
+  const rows = await query<UserRow[]>(
+    'SELECT id, coinBalance, isAdmin, isBlocked FROM User WHERE id = ?',
+    [userId]
+  )
+  if (rows.length === 0) return null
+  const u = rows[0]
+  return {
+    id: u.id,
+    coinBalance: Number(u.coinBalance),
+    isAdmin: toBool(u.isAdmin),
+    isBlocked: toBool(u.isBlocked),
+  }
+}
+
 export async function createUser({
   email,
   password,
@@ -53,21 +67,18 @@ export async function createUser({
   name?: string
 }) {
   const normalizedEmail = email.toLowerCase().trim()
-  const existing = await db.user.findUnique({
-    where: { email: normalizedEmail },
-  })
-  if (existing) {
+  const existing = await query<UserRow[]>('SELECT id FROM User WHERE email = ?', [normalizedEmail])
+  if (existing.length > 0) {
     throw new Error('Bu email allaqachon ro\'yxatdan o\'tgan')
   }
 
   const hashedPassword = await hashPassword(password)
-  const user = await db.user.create({
-    data: {
-      email: normalizedEmail,
-      password: hashedPassword,
-      name: name?.trim() || null,
-    },
-  })
+  const id = generateId()
+  await execute(
+    `INSERT INTO User (id, email, name, password, coinBalance, phoneVerified, testsCompletedToday, isAdmin, isBlocked, createdAt, updatedAt)
+     VALUES (?, ?, ?, ?, 0, 0, 0, 0, 0, NOW(), NOW())`,
+    [id, normalizedEmail, name?.trim() || null, hashedPassword]
+  )
 
-  return user
+  return { id, email: normalizedEmail, name: name?.trim() || null }
 }

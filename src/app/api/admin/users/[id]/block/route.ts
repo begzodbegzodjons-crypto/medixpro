@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { execute } from '@/lib/db'
 import { verifyAdminRequest } from '@/lib/admin-auth'
 
 export async function POST(
@@ -10,14 +10,9 @@ export async function POST(
     if (!verifyAdminRequest(request.headers.get('Authorization'))) {
       return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     }
-
     const { id } = await params
     const { isBlocked } = await request.json()
-
-    await db.user.update({
-      where: { id },
-      data: { isBlocked: !!isBlocked },
-    })
+    await execute('UPDATE User SET isBlocked = ?, updatedAt = NOW() WHERE id = ?', [isBlocked ? 1 : 0, id])
 
     return NextResponse.json({
       id,

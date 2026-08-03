@@ -1,70 +1,49 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { transaction, generateId } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth-server'
-import { invalidatePattern } from '@/lib/cache'
+import { invalidateCache, cacheKeys } from '@/lib/cache'
 
 export async function POST(request: Request) {
   try {
     const user = await getCurrentUser()
     if (!user?.id) {
-      return NextResponse.json(
-        { message: 'Avtorizatsiya talab qilinadi' },
-        { status: 401 }
-      )
+      return NextResponse.json({ message: 'Avtorizatsiya talab qilinadi' }, { status: 401 })
     }
 
     const { code } = await request.json()
     if (!code) {
-      return NextResponse.json(
-        { message: 'Kod talab qilinadi' },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: 'Kod talab qilinadi' }, { status: 400 })
     }
 
-    const result = await db.$transaction(async (tx) => {
-      const pkg = await tx.coinPackage.findUnique({
-        where: { code: String(code).trim().toUpperCase() },
-      })
+    const result = await transaction(async (conn) => {
+      const [rows]: any = await conn.query(
+        'SELECT id, name, coins, code, isActive FROM CoinPackage WHERE code = ?',
+        [String(code).trim().toUpperCase()]
+      )
+      if (rows.length === 0) throw new Error('Noto\'g\'ri kod')
+      const pkg = rows[0]
+      if (!Boolean(pkg.isActive)) throw new Error('Bu paket faol emas')
 
-      if (!pkg) throw new Error('Noto\'g\'ri kod')
-      if (!pkg.isActive) throw new Error('Bu paket faol emas')
+      const [users]: any = await conn.query('SELECT coinBalance FROM User WHERE id = ?', [user.id])
+      if (users.length === 0) throw new Error('Foydalanuvchi topilmadi')
+      const balanceBefore = Number(users[0].coinBalance)
+      const balanceAfter = balanceBefore + Number(pkg.coins)
 
-      const currentUser = await tx.user.findUnique({
-        where: { id: user.id },
-        select: { coinBalance: true },
-      })
-      if (!currentUser) throw new Error('Foydalanuvchi topilmadi')
+      await conn.execute('UPDATE User SET coinBalance = ? WHERE id = ?', [balanceAfter, user.id])
 
-      const balanceBefore = currentUser.coinBalance
-      const balanceAfter = balanceBefore + pkg.coins
+      const tId = generateId()
+      await conn.execute(
+        `INSERT INTO Transaction (id, userId, type, amount, description, balanceBefore, balanceAfter, createdAt)
+         VALUES (?, ?, 'coin_package', ?, ?, ?, ?, NOW())`,
+        [tId, user.id, Number(pkg.coins), `COIN paketi: ${pkg.name} (${pkg.code})`, balanceBefore, balanceAfter]
+      )
 
-      await tx.user.update({
-        where: { id: user.id },
-        data: { coinBalance: balanceAfter },
-      })
+      await conn.execute('UPDATE CoinPackage SET isActive = 0 WHERE id = ?', [pkg.id])
 
-      await tx.transaction.create({
-        data: {
-          userId: user.id,
-          type: 'coin_package',
-          amount: pkg.coins,
-          description: `COIN paketi: ${pkg.name} (${pkg.code})`,
-          balanceBefore,
-          balanceAfter,
-        },
-      })
-
-      // Deactivate the package code (one-time use)
-      await tx.coinPackage.update({
-        where: { id: pkg.id },
-        data: { isActive: false },
-      })
-
-      return { coins: pkg.coins, balanceAfter }
+      return { coins: Number(pkg.coins), balanceAfter }
     })
 
-    // Invalidate cached balance
-    invalidatePattern(`user:coins:${user.id}`)
+    invalidateCache(cacheKeys.userCoinBalance(user.id))
 
     return NextResponse.json({ success: true, coins: result.coins })
   } catch (error) {

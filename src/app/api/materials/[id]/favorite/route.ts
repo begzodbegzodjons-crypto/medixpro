@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { query, execute } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth-server'
 
 export async function POST(
@@ -9,43 +9,31 @@ export async function POST(
   try {
     const user = await getCurrentUser()
     if (!user?.id) {
-      return NextResponse.json(
-        { message: 'Avtorizatsiya talab qilinadi' },
-        { status: 401 }
-      )
+      return NextResponse.json({ message: 'Avtorizatsiya talab qilinadi' }, { status: 401 })
     }
 
     const { id: materialId } = await params
 
-    // Check if already favorited
-    const existing = await db.favorite.findUnique({
-      where: {
-        userId_materialId: { userId: user.id, materialId },
-      },
-    })
+    const existing = await query<any[]>(
+      'SELECT id FROM Favorite WHERE userId = ? AND materialId = ?',
+      [user.id, materialId]
+    )
 
-    if (existing) {
-      // Unfavorite
-      await db.favorite.delete({
-        where: { id: existing.id },
-      })
+    if (existing.length > 0) {
+      await execute('DELETE FROM Favorite WHERE id = ?', [existing[0].id])
       return NextResponse.json({ success: true, favorited: false })
     }
 
-    // Add to favorites
-    await db.favorite.create({
-      data: {
-        userId: user.id,
-        materialId,
-      },
-    })
+    const { generateId } = await import('@/lib/db')
+    const favId = generateId()
+    await execute(
+      'INSERT INTO Favorite (id, userId, materialId, createdAt) VALUES (?, ?, ?, NOW())',
+      [favId, user.id, materialId]
+    )
 
     return NextResponse.json({ success: true, favorited: true })
   } catch (error) {
     console.error('[api/materials/[id]/favorite] error:', error)
-    return NextResponse.json(
-      { message: 'Server xatosi' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Server xatosi' }, { status: 500 })
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { execute } from '@/lib/db'
 import { verifyAdminRequest } from '@/lib/admin-auth'
 
 export async function PUT(
@@ -10,21 +10,23 @@ export async function PUT(
     if (!verifyAdminRequest(request.headers.get('Authorization'))) {
       return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     }
-
     const { id } = await params
     const body = await request.json()
 
-    const data: any = {}
-    if (body.subjectId !== undefined) data.subjectId = body.subjectId
-    if (body.title !== undefined) data.title = body.title
-    if (body.description !== undefined) data.description = body.description
-    if (body.fileUrl !== undefined) data.fileUrl = body.fileUrl
-    if (body.type !== undefined) data.type = body.type
-    if (body.price !== undefined) data.price = Number(body.price)
+    const sets: string[] = []
+    const values: any[] = []
+    if (body.subjectId !== undefined) { sets.push('subjectId = ?'); values.push(body.subjectId) }
+    if (body.title !== undefined) { sets.push('title = ?'); values.push(body.title) }
+    if (body.description !== undefined) { sets.push('description = ?'); values.push(body.description) }
+    if (body.fileUrl !== undefined) { sets.push('fileUrl = ?'); values.push(body.fileUrl) }
+    if (body.type !== undefined) { sets.push('type = ?'); values.push(body.type) }
+    if (body.price !== undefined) { sets.push('price = ?'); values.push(Number(body.price)) }
+    if (body.isFree !== undefined) { sets.push('isFree = ?'); values.push(body.isFree ? 1 : 0) }
+    sets.push('updatedAt = NOW()')
+    values.push(id)
 
-    const material = await db.material.update({ where: { id }, data })
-
-    return NextResponse.json(material)
+    await execute(`UPDATE Material SET ${sets.join(', ')} WHERE id = ?`, values)
+    return NextResponse.json({ id })
   } catch (error) {
     console.error('[admin] material PUT error:', error)
     return NextResponse.json({ message: 'Server xatosi' }, { status: 500 })
@@ -39,11 +41,8 @@ export async function DELETE(
     if (!verifyAdminRequest(request.headers.get('Authorization'))) {
       return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     }
-
     const { id } = await params
-
-    await db.material.delete({ where: { id } })
-
+    await execute('DELETE FROM Material WHERE id = ?', [id])
     return NextResponse.json({ success: true, message: 'Material o\'chirildi' })
   } catch (error) {
     console.error('[admin] material DELETE error:', error)

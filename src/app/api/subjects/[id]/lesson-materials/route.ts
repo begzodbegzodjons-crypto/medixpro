@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { query } from '@/lib/db'
 
 export async function GET(
   request: Request,
@@ -14,45 +14,59 @@ export async function GET(
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 50)
     const skip = (page - 1) * limit
 
-    const where: any = { subjectId: id, isPublic: true }
-    if (topicId) where.topicId = topicId
-    if (classLevel) where.classLevel = parseInt(classLevel)
+    const where: string[] = ['lm.subjectId = ?', 'lm.isPublic = 1']
+    const values: any[] = [id]
+    if (topicId) {
+      where.push('lm.topicId = ?')
+      values.push(topicId)
+    }
+    if (classLevel) {
+      where.push('lm.classLevel = ?')
+      values.push(parseInt(classLevel))
+    }
+    const whereSql = where.join(' AND ')
 
-    const [materials, total] = await Promise.all([
-      db.lessonMaterial.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          type: true,
-          classLevel: true,
-          createdAt: true,
-          topic: { select: { id: true, name: true } },
-          author: { select: { id: true, name: true } },
-        },
-      }),
-      db.lessonMaterial.count({ where }),
+    const [mats, totalRows] = await Promise.all([
+      query<any[]>(
+        `SELECT lm.id, lm.title, lm.description, lm.fileUrls, lm.type, lm.classLevel, lm.createdAt,
+                s.id AS subjectId, s.name AS subjectName, s.icon AS subjectIcon,
+                tp.id AS topicId, tp.name AS topicName,
+                u.id AS authorId, u.name AS authorName
+         FROM LessonMaterial lm
+         LEFT JOIN Subject s ON s.id = lm.subjectId
+         LEFT JOIN Topic tp ON tp.id = lm.topicId
+         LEFT JOIN User u ON u.id = lm.authorId
+         WHERE ${whereSql}
+         ORDER BY lm.createdAt DESC
+         LIMIT ? OFFSET ?`,
+        [...values, limit, skip]
+      ),
+      query<any[]>(`SELECT COUNT(*) as cnt FROM LessonMaterial lm WHERE ${whereSql}`, values),
     ])
 
+    const total = Number(totalRows[0]?.cnt || 0)
+
     return NextResponse.json({
-      items: materials,
+      items: mats.map((m) => ({
+        id: m.id,
+        title: m.title,
+        description: m.description,
+        fileUrls: JSON.parse(m.fileUrls),
+        type: m.type,
+        classLevel: m.classLevel,
+        createdAt: m.createdAt,
+        subject: { id: m.subjectId, name: m.subjectName, icon: m.subjectIcon },
+        topic: m.topicId ? { id: m.topicId, name: m.topicName } : null,
+        author: m.authorId ? { id: m.authorId, name: m.authorName } : null,
+      })),
       pagination: {
-        page,
-        limit,
-        total,
+        page, limit, total,
         totalPages: Math.ceil(total / limit),
         hasMore: page * limit < total,
       },
     })
   } catch (error) {
     console.error('[api/subjects/[id]/lesson-materials] error:', error)
-    return NextResponse.json(
-      { message: 'Server xatosi' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Server xatosi' }, { status: 500 })
   }
 }

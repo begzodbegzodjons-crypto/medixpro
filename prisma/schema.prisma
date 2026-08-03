@@ -1,4 +1,4 @@
-// UstozPro - Prisma schema (SQLite)
+// UstozPro - Prisma schema (MySQL / TiDB Cloud Serverless)
 // O'qituvchilar uchun professional ta'lim platformasi - kengaytirilgan versiya
 
 generator client {
@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("USTOZPRO_DATABASE_URL")
 }
 
 model User {
@@ -28,7 +28,7 @@ model User {
   subject             String? // Main teaching subject
   school              String? // School name
   district            String? // Tuman/shahar
-  bio                 String?
+  bio                 String?  @db.Text
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -52,12 +52,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String?  @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -102,7 +102,7 @@ model Topic {
   id          String   @id @default(cuid())
   subjectId   String
   name        String
-  description String?
+  description String?  @db.Text
   order       Int      @default(0)
   createdAt   DateTime @default(now())
 
@@ -117,11 +117,11 @@ model Test {
   id             String   @id @default(cuid())
   subjectId      String
   title          String
-  description    String?
+  description    String?  @db.Text
   // JSON-encoded array of { id, text, options[] }
-  questions      String
+  questions      String   @db.LongText
   // JSON-encoded array of correct answer indices (parallel to questions)
-  correctAnswers String
+  correctAnswers String   @db.LongText
   passingScore   Int      @default(60)
   timeLimit      Int?
   createdAt      DateTime @default(now())
@@ -140,7 +140,7 @@ model TestResult {
   testId    String
   score     Float
   passed    Boolean
-  answers   String?
+  answers   String?  @db.LongText
   timeTaken Int?
   createdAt DateTime @default(now())
 
@@ -157,7 +157,7 @@ model Transaction {
   userId        String
   type          String
   amount        Float
-  description   String?
+  description   String?  @db.Text
   balanceBefore Float?
   balanceAfter  Float?
   createdAt     DateTime @default(now())
@@ -172,7 +172,7 @@ model Material {
   id          String   @id @default(cuid())
   subjectId   String
   title       String
-  description String?
+  description String?  @db.Text
   fileUrl     String
   type        String // 'pdf', 'video', 'document', 'presentation'
   price       Float   @default(0)
@@ -237,10 +237,10 @@ model LessonPlan {
   subjectId   String
   topicId     String?
   title       String
-  description String?
+  description String?  @db.Text
   // JSON-encoded structured content
   // { objectives, materials, stages, homework, assessment }
-  content     String
+  content     String   @db.LongText
   // Class level: 5, 6, 7, 8, 9, 10, 11
   classLevel  Int?
   // Lesson duration in minutes
@@ -267,9 +267,9 @@ model LessonMaterial {
   subjectId   String
   topicId     String?
   title       String
-  description String?
+  description String?  @db.Text
   // JSON-encoded list of file URLs
-  fileUrls    String
+  fileUrls    String   @db.Text
   // Material type: 'presentation', 'worksheet', 'test', 'video', 'document'
   type        String
   classLevel  Int?
@@ -315,7 +315,7 @@ model CoinPackage {
 model Advertisement {
   id          String   @id @default(cuid())
   title       String
-  description String?
+  description String?  @db.Text
   imageUrl    String?
   fileType    String?
   position    String   @default("sidebar")
@@ -332,7 +332,7 @@ model Notification {
   id        String   @id @default(cuid())
   userId    String
   title     String
-  message   String
+  message   String   @db.Text
   type      String   @default("info") // info, success, warning, error
   isRead    Boolean  @default(false)
   link      String?
@@ -347,5 +347,5 @@ model Notification {
 model Setting {
   id    String @id @default(cuid())
   key   String @unique
-  value String
+  value String  @db.Text
 }

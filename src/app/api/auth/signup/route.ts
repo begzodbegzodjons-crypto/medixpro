@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { hashPassword } from '@/lib/auth-server'
+import { createUser } from '@/lib/auth-server'
 
 export async function POST(request: Request) {
   try {
@@ -20,34 +19,19 @@ export async function POST(request: Request) {
       )
     }
 
-    const normalizedEmail = email.toLowerCase().trim()
-
-    // Check if user already exists
-    const existing = await db.user.findUnique({
-      where: { email: normalizedEmail },
-    })
-    if (existing) {
+    try {
+      const user = await createUser({ email, password, name })
+      return NextResponse.json({
+        success: true,
+        userId: user.id,
+        message: 'Hisob muvaffaqiyatli yaratildi',
+      })
+    } catch (e: any) {
       return NextResponse.json(
-        { message: 'Bu email allaqachon ro\'yxatdan o\'tgan' },
+        { message: e.message || 'Xato yuz berdi' },
         { status: 409 }
       )
     }
-
-    // Hash password and create user
-    const hashedPassword = await hashPassword(password)
-    const user = await db.user.create({
-      data: {
-        email: normalizedEmail,
-        password: hashedPassword,
-        name: name?.trim() || null,
-      },
-    })
-
-    return NextResponse.json({
-      success: true,
-      userId: user.id,
-      message: 'Hisob muvaffaqiyatli yaratildi',
-    })
   } catch (error: any) {
     console.error('[signup] error:', error)
     return NextResponse.json(
