@@ -34,19 +34,9 @@ export async function verifyPassword(password: string, hashedPassword: string) {
 }
 
 /**
- * Update user's coin balance and invalidate the cached balance.
- * Use this for any balance-changing operation (purchases, rewards, redemptions).
+ * Invalidate cached user data after balance changes.
  */
-export async function updateUserCoins(
-  userId: string,
-  newBalance: number,
-  options?: { balanceBefore?: number; balanceAfter?: number }
-) {
-  await db.user.update({
-    where: { id: userId },
-    data: { coinBalance: newBalance },
-  })
-  // Invalidate cached balance so next session check fetches fresh value
+export async function invalidateUserCache(userId: string) {
   invalidateCache(cacheKeys.userCoinBalance(userId))
 }
 
