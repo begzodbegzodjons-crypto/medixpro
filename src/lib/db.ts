@@ -14,21 +14,31 @@ import { connect, type Connection } from '@tidbcloud/serverless'
  * `conn.begin()` -> `tx.execute()` -> `tx.commit()`.
  */
 
+// Fallback connection string (used if env var not set - for demo purposes)
+// In production, set USTOZPRO_DATABASE_URL as a Secret in Cloudflare dashboard
+const FALLBACK_DB_URL = 'mysql://2PS5aujUXSKBu38.root:Wko2XOaA6o8m1AAU@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/ustozpro'
+
 const globalForDb = globalThis as unknown as {
   tidbConn: Connection | undefined
 }
 
-function getDatabaseUrl(): string | null {
-  return process.env.USTOZPRO_DATABASE_URL || process.env.DATABASE_URL || null
+function getDatabaseUrl(): string {
+  // Try env var first (set as Secret in Cloudflare dashboard)
+  const envUrl = process.env.USTOZPRO_DATABASE_URL || process.env.DATABASE_URL
+  if (envUrl) return envUrl
+  // Fallback to hardcoded (demo only - replace with your Secret in production)
+  return FALLBACK_DB_URL
 }
 
 function getConnection(): Connection {
   if (!globalForDb.tidbConn) {
     const url = getDatabaseUrl()
-    if (!url) {
-      throw new Error('Database URL not configured. Set USTOZPRO_DATABASE_URL.')
+    try {
+      globalForDb.tidbConn = connect({ url })
+    } catch (e) {
+      console.error('[db] Failed to connect:', e)
+      throw e
     }
-    globalForDb.tidbConn = connect({ url })
   }
   return globalForDb.tidbConn
 }
