@@ -110,12 +110,28 @@
       "namedRegex": "^/api/lesson\\-plans/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/api/materials/[id]/download",
+      "regex": "^/api/materials/([^/]+?)/download(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/materials/(?<nxtPid>[^/]+?)/download(?:/)?$"
+    },
+    {
       "page": "/api/materials/[id]/favorite",
       "regex": "^/api/materials/([^/]+?)/favorite(?:/)?$",
       "routeKeys": {
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/api/materials/(?<nxtPid>[^/]+?)/favorite(?:/)?$"
+    },
+    {
+      "page": "/api/materials/[id]/preview",
+      "regex": "^/api/materials/([^/]+?)/preview(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/materials/(?<nxtPid>[^/]+?)/preview(?:/)?$"
     },
     {
       "page": "/api/subjects/[id]/lesson-materials",
@@ -156,6 +172,14 @@
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/api/tests/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/tests/[id]/render",
+      "regex": "^/api/tests/([^/]+?)/render(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/tests/(?<nxtPid>[^/]+?)/render(?:/)?$"
     }
   ],
   "staticRoutes": [
