@@ -1,140 +1,44 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BarChart3, Users, BookOpen, Coins, ShoppingCart } from 'lucide-react'
-
-interface Stats {
-  totalUsers: number
-  totalSubjects: number
-  totalTests: number
-  totalMaterials: number
-  activeCoinPackages: number
-}
+import { BarChart3, Users, BookOpen, Coins, ShoppingCart, FileText } from 'lucide-react'
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats>({
-    totalUsers: 0,
-    totalSubjects: 0,
-    totalTests: 0,
-    totalMaterials: 0,
-    activeCoinPackages: 0,
-  })
+  const [stats, setStats] = useState({ totalUsers: 0, totalSubjects: 0, totalTests: 0, totalMaterials: 0, activeCoinPackages: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('adminToken')
-        const response = await fetch('/api/admin/stats', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          setStats(data)
-        }
-      } catch (error) {
-        console.error('[v0] Failed to fetch stats:', error)
-      } finally {
-        setLoading(false)
-      }
+        const response = await fetch('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } })
+        if (response.ok) setStats(await response.json())
+      } catch (e) { console.error(e) } finally { setLoading(false) }
     }
-
     fetchStats()
   }, [])
 
   const statCards = [
-    {
-      title: 'Foydalanuvchilar',
-      value: stats.totalUsers,
-      icon: Users,
-      color: 'bg-blue-500',
-    },
-    {
-      title: 'Fanlar',
-      value: stats.totalSubjects,
-      icon: BookOpen,
-      color: 'bg-green-500',
-    },
-    {
-      title: 'Testlar',
-      value: stats.totalTests,
-      icon: ShoppingCart,
-      color: 'bg-purple-500',
-    },
-    {
-      title: 'Materiallar',
-      value: stats.totalMaterials,
-      icon: BarChart3,
-      color: 'bg-orange-500',
-    },
-    {
-      title: 'COIN Paketlari',
-      value: stats.activeCoinPackages,
-      icon: Coins,
-      color: 'bg-yellow-500',
-    },
+    { title: 'Foydalanuvchilar', value: stats.totalUsers, icon: Users },
+    { title: 'Fanlar', value: stats.totalSubjects, icon: BookOpen },
+    { title: 'Testlar', value: stats.totalTests, icon: FileText },
+    { title: 'Materiallar', value: stats.totalMaterials, icon: ShoppingCart },
+    { title: 'COIN paketlar', value: stats.activeCoinPackages, icon: Coins },
   ]
 
-  if (loading) {
-    return <div className="text-center py-12">Yuklanmoqda...</div>
-  }
+  if (loading) return <div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin"></div></div>
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Admin panel-ga xush kelibsiz</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-        {statCards.map((card, index) => (
-          <div key={index} className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">{card.title}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
-                  {card.value}
-                </p>
-              </div>
-              <div className={`${card.color} rounded-lg p-3`}>
-                <card.icon className="w-6 h-6 text-white" />
-              </div>
-            </div>
+      <div className="mb-6"><h1 className="text-xl font-semibold text-neutral-900">Dashboard</h1><p className="text-sm text-neutral-500 mt-1">Umumiy statistika</p></div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {statCards.map((card, i) => (
+          <div key={i} className="card p-5">
+            <card.icon className="w-5 h-5 text-neutral-400 mb-2" />
+            <p className="text-xs text-neutral-500 mb-0.5">{card.title}</p>
+            <p className="text-2xl font-semibold text-neutral-900">{card.value}</p>
           </div>
         ))}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Tez Harakatlari</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <a
-            href="/admin/subjects/new"
-            className="p-4 border-2 border-blue-500 rounded-lg hover:bg-blue-50 transition-colors text-center"
-          >
-            <p className="font-semibold text-blue-600">Yangi Fan</p>
-          </a>
-          <a
-            href="/admin/tests/new"
-            className="p-4 border-2 border-green-500 rounded-lg hover:bg-green-50 transition-colors text-center"
-          >
-            <p className="font-semibold text-green-600">Yangi Test</p>
-          </a>
-          <a
-            href="/admin/marketplace/new"
-            className="p-4 border-2 border-purple-500 rounded-lg hover:bg-purple-50 transition-colors text-center"
-          >
-            <p className="font-semibold text-purple-600">Yangi Material</p>
-          </a>
-          <a
-            href="/admin/coins/create-package"
-            className="p-4 border-2 border-orange-500 rounded-lg hover:bg-orange-50 transition-colors text-center"
-          >
-            <p className="font-semibold text-orange-600">COIN Paketi</p>
-          </a>
-        </div>
       </div>
     </div>
   )

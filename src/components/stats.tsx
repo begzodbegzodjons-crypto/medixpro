@@ -1,171 +1,53 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { TrendingUp, CheckCircle, XCircle, Target, Award } from 'lucide-react'
-
-interface StatsData {
-  totalTests: number
-  passedTests: number
-  failedTests: number
-  averageScore: string | number
-  recentResults: Array<{
-    id: string
-    score: number
-    passed: boolean
-    timeTaken: number | null
-    createdAt: string
-    test: {
-      id: string
-      title: string
-      subject: { name: string }
-    }
-  }>
-}
 
 export default function Stats() {
-  const [stats, setStats] = useState<StatsData | null>(null)
+  const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch('/api/stats')
-        if (res.ok) {
-          const data = await res.json()
-          setStats(data)
-        }
-      } catch (error) {
-        console.error('Failed to load stats', error)
-      } finally {
-        setLoading(false)
-      }
-    }
+  useEffect(() => { fetch('/api/stats').then(r => r.json()).then(setStats).catch(console.error).finally(() => setLoading(false)) }, [])
 
-    load()
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    )
-  }
+  if (loading) return <div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin"></div></div>
 
   const cards = [
-    {
-      title: 'Jami testlar',
-      value: stats?.totalTests || 0,
-      icon: Target,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50',
-    },
-    {
-      title: "O'tgan testlar",
-      value: stats?.passedTests || 0,
-      icon: CheckCircle,
-      color: 'text-green-600',
-      bg: 'bg-green-50',
-    },
-    {
-      title: 'Yutqazgan testlar',
-      value: stats?.failedTests || 0,
-      icon: XCircle,
-      color: 'text-red-600',
-      bg: 'bg-red-50',
-    },
-    {
-      title: "O'rtacha ball",
-      value: `${stats?.averageScore || 0}%`,
-      icon: TrendingUp,
-      color: 'text-purple-600',
-      bg: 'bg-purple-50',
-    },
+    { title: 'Jami testlar', value: stats?.totalTests || 0 },
+    { title: "O'tgan", value: stats?.passedTests || 0 },
+    { title: 'Yutqazgan', value: stats?.failedTests || 0 },
+    { title: "O'rtacha ball", value: `${stats?.averageScore || 0}%` },
   ]
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Statistika</h2>
-        <p className="text-gray-600 text-sm md:text-base">O&apos;qish jarayoningizni kuzating</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-        {cards.map((card, index) => (
-          <div key={index} className="bg-white rounded-lg shadow p-4 md:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-xs md:text-sm font-medium">{card.title}</p>
-                <p className={`text-xl md:text-3xl font-bold ${card.color} mt-1`}>
-                  {card.value}
-                </p>
-              </div>
-              <div className={`${card.bg} rounded-lg p-2 md:p-3`}>
-                <card.icon className={`w-5 h-5 md:w-6 md:h-6 ${card.color}`} />
-              </div>
-            </div>
+      <div className="mb-6"><h2 className="text-lg font-medium text-neutral-900 mb-1">Statistika</h2><p className="text-sm text-neutral-500">O'qish jarayoningiz</p></div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        {cards.map((card, i) => (
+          <div key={i} className="card p-5">
+            <p className="text-xs text-neutral-500 mb-1">{card.title}</p>
+            <p className="text-2xl font-semibold text-neutral-900">{card.value}</p>
           </div>
         ))}
       </div>
-
-      {/* Recent Results */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-4 md:p-6 border-b border-gray-200">
-          <h3 className="text-base md:text-lg font-bold text-gray-900">So&apos;nggi test natijalari</h3>
-        </div>
-
-        {stats?.recentResults && stats.recentResults.length > 0 ? (
+      {stats?.recentResults && stats.recentResults.length > 0 && (
+        <div className="card overflow-hidden">
+          <div className="p-4 border-b border-neutral-200"><h3 className="font-medium text-neutral-900">So'nggi natijalar</h3></div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-semibold text-gray-700">Test</th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-semibold text-gray-700 hidden md:table-cell">Fan</th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-semibold text-gray-700">Ball</th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-semibold text-gray-700">Natija</th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-semibold text-gray-700 hidden sm:table-cell">Sana</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {stats.recentResults.map((result) => (
-                  <tr key={result.id} className="hover:bg-gray-50">
-                    <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-900">
-                      {result.test.title}
-                    </td>
-                    <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600 hidden md:table-cell">
-                      {result.test.subject?.name || '-'}
-                    </td>
-                    <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm font-semibold text-gray-900">
-                      {Number(result.score).toFixed(1)}%
-                    </td>
-                    <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          result.passed
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {result.passed ? 'O\'tdi' : 'Yutqazdi'}
-                      </span>
-                    </td>
-                    <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600 hidden sm:table-cell">
-                      {new Date(result.createdAt).toLocaleDateString('uz')}
-                    </td>
+              <thead className="bg-neutral-50"><tr><th className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500">Test</th><th className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500 hidden md:table-cell">Fan</th><th className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500">Ball</th><th className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500">Natija</th></tr></thead>
+              <tbody className="divide-y divide-neutral-100">
+                {stats.recentResults.map((r: any) => (
+                  <tr key={r.id} className="hover:bg-neutral-50">
+                    <td className="px-4 py-3 text-sm text-neutral-900">{r.test?.title}</td>
+                    <td className="px-4 py-3 text-sm text-neutral-500 hidden md:table-cell">{r.test?.subject?.name}</td>
+                    <td className="px-4 py-3 text-sm font-medium text-neutral-900">{Number(r.score).toFixed(1)}%</td>
+                    <td className="px-4 py-3"><span className={`badge ${r.passed ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600'}`}>{r.passed ? "O'tdi" : 'Yutqazdi'}</span></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        ) : (
-          <div className="p-8 md:p-12 text-center">
-            <Award className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-600">Siz hali test topshirmagansiz</p>
-            <p className="text-gray-500 text-sm mt-1">Testlar bo&apos;limidan birinchi testni boshlang</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

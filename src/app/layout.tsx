@@ -4,8 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/lib/auth-client";
 
 export const metadata: Metadata = {
-  title: "UstozPro - O'qituvchilar uchun professional platforma",
-  description: "O'qituvchilar uchun testlar, materiallarni boshqarish va COIN tizimi",
+  title: "UstozPro — O'qituvchilar uchun platforma",
+  description: "Testlar, dars rejalari va o'quv materiallari",
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
@@ -18,10 +18,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light',
-  themeColor: '#2563eb',
+  themeColor: '#0a0a0a',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -31,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uz" className="scroll-smooth" style={{ colorScheme: 'light' }} suppressHydrationWarning>
-      <body className="antialiased bg-gray-50">
+      <body className="antialiased bg-white text-neutral-900">
         <AuthProvider>{children}</AuthProvider>
         <Toaster />
       </body>
