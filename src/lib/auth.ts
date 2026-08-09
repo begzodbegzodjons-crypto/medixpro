@@ -9,6 +9,12 @@ import { getCached, setCached, cacheKeys, TTL, invalidateCache } from '@/lib/cac
 
 const SECRET = process.env.NEXTAUTH_SECRET ?? 'ustoz-pro-dev-secret-change-me-in-production-32chars'
 
+// Force NEXTAUTH_URL at module level (Workers don't always propagate env vars)
+const NEXTAUTH_URL = process.env.NEXTAUTH_URL || 'https://ustoz-pro.mirzalimovbegzod8.workers.dev'
+if (!process.env.NEXTAUTH_URL) {
+  process.env.NEXTAUTH_URL = NEXTAUTH_URL
+}
+
 /**
  * Custom JWT encode/decode using HMAC signing instead of JWE encryption.
  * More reliable in proxy/sandbox environments.
