@@ -2,36 +2,21 @@ import { NextResponse } from 'next/server'
 import { transaction, generateId } from '@/lib/db'
 import { verifyAdminRequest } from '@/lib/admin-auth'
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    if (!verifyAdminRequest(request.headers.get('Authorization'))) {
-      return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
-    }
+    if (!verifyAdminRequest(request.headers.get('Authorization'))) return NextResponse.json({ message: 'Ruxsat yo\'q' }, { status: 401 })
     const { id } = await params
     const { coins } = await request.json()
-
-    if (typeof coins !== 'number' || coins < 0) {
-      return NextResponse.json({ message: 'COIN miqdori noto\'g\'ri' }, { status: 400 })
-    }
+    if (typeof coins !== 'number' || coins < 0) return NextResponse.json({ message: 'COIN miqdori noto\'g\'ri' }, { status: 400 })
 
     await transaction(async (tx) => {
       const userRes: any = await tx.execute('SELECT coinBalance FROM User WHERE id = ?', [id])
       const rows = userRes.rows || userRes
       if (!rows || rows.length === 0) throw new Error('Foydalanuvchi topilmadi')
-
-      const balanceBefore = Number(rows[0].coinBalance)
-      const balanceAfter = coins
+      const balanceBefore = Number(rows[0].coinBalance); const balanceAfter = coins
       await tx.execute('UPDATE User SET coinBalance = ? WHERE id = ?', [coins, id])
-
       const tId = generateId()
-      await tx.execute(
-        `INSERT INTO Transaction (id, userId, type, amount, description, balanceBefore, balanceAfter, createdAt)
-         VALUES (?, ?, 'admin_adjustment', ?, ?, ?, ?, NOW())`,
-        [tId, id, balanceAfter - balanceBefore, 'Admin tomonidan balans tahrirlandi', balanceBefore, balanceAfter]
-      )
+      await tx.execute("INSERT INTO Transaction (id, userId, type, amount, description, balanceBefore, balanceAfter, createdAt) VALUES (?, ?, 'admin_adjustment', ?, ?, ?, ?, NOW())", [tId, id, balanceAfter - balanceBefore, 'Admin tomonidan balans tahrirlandi', balanceBefore, balanceAfter])
     })
 
     return NextResponse.json({ id, coins, message: 'COIN balans yangilandi' })
