@@ -9,31 +9,16 @@ export default async function SignUpPage() {
   if (user?.id) redirect('/')
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-neutral-900 text-white p-10 flex-col justify-between">
-        <div>
-          <h1 className="text-base font-semibold tracking-tight">UstozPro</h1>
-          <p className="text-white/50 text-[11px] mt-0.5">O'qituvchilar uchun</p>
-        </div>
-        <div className="max-w-sm">
-          <h2 className="text-xl font-semibold leading-snug mb-3">
-            Hamjamiyatga qo'shiling
-          </h2>
-          <p className="text-white/60 text-[12px] leading-relaxed">
-            Dars ishlanmalari, testlar, reja va materiallarga bepul kirish.
-          </p>
-          <div className="space-y-1.5 mt-6">
-            {['Dars rejalari (5-11 sinf)', 'Prezentatsiyalar', 'Testlar', 'Ish varaqalari'].map((t) => (
-              <div key={t} className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-white/50"></div>
-                <span className="text-white/70 text-[11px]">{t}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <p className="text-white/30 text-[10px]">© 2026 UstozPro</p>
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      <div className="absolute inset-0 z-0">
+        <img src="/hero-students.png" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-neutral-900/80"></div>
       </div>
-      <div className="flex-1 flex items-center justify-center p-5 bg-white">
+      <div className="relative z-10 w-full max-w-sm bg-white rounded-xl shadow-2xl p-8">
+        <div className="text-center mb-6">
+          <h1 className="text-xl font-semibold text-neutral-900 tracking-tight">UstozPro</h1>
+          <p className="text-sm text-neutral-500 mt-1">O'qituvchilar uchun platforma</p>
+        </div>
         <AuthForm mode="sign-up" />
       </div>
     </div>

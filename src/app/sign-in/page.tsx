@@ -9,29 +9,18 @@ export default async function SignInPage() {
   if (user?.id) redirect('/')
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-neutral-900 text-white p-10 flex-col justify-between">
-        <div>
-          <h1 className="text-base font-semibold tracking-tight">UstozPro</h1>
-          <p className="text-white/50 text-[11px] mt-0.5">O'qituvchilar uchun</p>
-        </div>
-        <div className="max-w-sm">
-          <h2 className="text-xl font-semibold leading-snug mb-3">
-            Dars ishlanmalari va testlar bir joyda
-          </h2>
-          <p className="text-white/60 text-[12px] leading-relaxed">
-            11 fan, dars rejalari, ish varaqalari, prezentatsiyalar va testlar. Bepul.
-          </p>
-          <div className="grid grid-cols-4 gap-2 mt-6">
-            <div><div className="text-lg font-semibold">11</div><div className="text-white/40 text-[10px]">Fan</div></div>
-            <div><div className="text-lg font-semibold">50+</div><div className="text-white/40 text-[10px]">Mavzu</div></div>
-            <div><div className="text-lg font-semibold">8+</div><div className="text-white/40 text-[10px]">Reja</div></div>
-            <div><div className="text-lg font-semibold">8+</div><div className="text-white/40 text-[10px]">Ish varaq</div></div>
-          </div>
-        </div>
-        <p className="text-white/30 text-[10px]">© 2026 UstozPro</p>
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      {/* Background image */}
+      <div className="absolute inset-0 z-0">
+        <img src="/hero-teacher.png" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-neutral-900/80"></div>
       </div>
-      <div className="flex-1 flex items-center justify-center p-5 bg-white">
+      {/* Form card */}
+      <div className="relative z-10 w-full max-w-sm bg-white rounded-xl shadow-2xl p-8">
+        <div className="text-center mb-6">
+          <h1 className="text-xl font-semibold text-neutral-900 tracking-tight">UstozPro</h1>
+          <p className="text-sm text-neutral-500 mt-1">O'qituvchilar uchun platforma</p>
+        </div>
         <AuthForm mode="sign-in" />
       </div>
     </div>
