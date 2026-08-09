@@ -1,11 +1,8 @@
 name = "ustoz-pro"
 compatibility_date = "2025-08-01"
-compatibility_flags = ["nodejs_compat"]
+compatibility_flags = ["nodejs_compat_v2"]
 main = ".open-next/worker.js"
 assets = { directory = ".open-next/assets", binding = "ASSETS" }
 
 [observability]
 enabled = true
-
-# NEXTAUTH_URL should be set as an environment variable in Cloudflare dashboard
-# Workers deploy URL pattern: https://<project-name>.<account-name>.workers.dev
