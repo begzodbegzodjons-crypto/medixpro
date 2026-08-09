@@ -10,44 +10,28 @@ export default async function SignInPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left - Info */}
-      <div className="hidden lg:flex lg:w-1/2 bg-neutral-900 text-white p-12 flex-col justify-between">
+      <div className="hidden lg:flex lg:w-1/2 bg-neutral-900 text-white p-10 flex-col justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">UstozPro</h1>
-          <p className="text-white/60 text-sm mt-1">O'qituvchilar uchun platforma</p>
+          <h1 className="text-base font-semibold tracking-tight">UstozPro</h1>
+          <p className="text-white/50 text-[11px] mt-0.5">O'qituvchilar uchun</p>
         </div>
-        <div className="max-w-md">
-          <h2 className="text-3xl font-semibold leading-tight mb-4">
-            Dars ishlanmalari, testlar va materiallar bir joyda
+        <div className="max-w-sm">
+          <h2 className="text-xl font-semibold leading-snug mb-3">
+            Dars ishlanmalari va testlar bir joyda
           </h2>
-          <p className="text-white/70 text-[15px] leading-relaxed">
-            11 fan bo'yicha dars rejalari, ish varaqalari, prezentatsiyalar, 
-            testlar va o'quv materiallari. Hammasi bepul va onlayn.
+          <p className="text-white/60 text-[12px] leading-relaxed">
+            11 fan, dars rejalari, ish varaqalari, prezentatsiyalar va testlar. Bepul.
           </p>
-          <div className="grid grid-cols-2 gap-4 mt-8">
-            <div>
-              <div className="text-2xl font-semibold">11</div>
-              <div className="text-white/50 text-xs mt-0.5">Fanlar</div>
-            </div>
-            <div>
-              <div className="text-2xl font-semibold">50+</div>
-              <div className="text-white/50 text-xs mt-0.5">Mavzular</div>
-            </div>
-            <div>
-              <div className="text-2xl font-semibold">8+</div>
-              <div className="text-white/50 text-xs mt-0.5">Dars rejalari</div>
-            </div>
-            <div>
-              <div className="text-2xl font-semibold">8+</div>
-              <div className="text-white/50 text-xs mt-0.5">Ish varaqalari</div>
-            </div>
+          <div className="grid grid-cols-4 gap-2 mt-6">
+            <div><div className="text-lg font-semibold">11</div><div className="text-white/40 text-[10px]">Fan</div></div>
+            <div><div className="text-lg font-semibold">50+</div><div className="text-white/40 text-[10px]">Mavzu</div></div>
+            <div><div className="text-lg font-semibold">8+</div><div className="text-white/40 text-[10px]">Reja</div></div>
+            <div><div className="text-lg font-semibold">8+</div><div className="text-white/40 text-[10px]">Ish varaq</div></div>
           </div>
         </div>
-        <p className="text-white/40 text-xs">© 2026 UstozPro</p>
+        <p className="text-white/30 text-[10px]">© 2026 UstozPro</p>
       </div>
-
-      {/* Right - Form */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-white">
+      <div className="flex-1 flex items-center justify-center p-5 bg-white">
         <AuthForm mode="sign-in" />
       </div>
     </div>

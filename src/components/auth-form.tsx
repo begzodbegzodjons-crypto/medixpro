@@ -43,47 +43,47 @@ export default function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-neutral-900 tracking-tight">
-          {isSignUp ? "Ro'yxatdan o'tish" : 'Tizimga kirish'}
+    <div className="w-full max-w-xs">
+      <div className="mb-6">
+        <h1 className="text-lg font-semibold text-neutral-900 tracking-tight">
+          {isSignUp ? "Ro'yxatdan o'tish" : 'Kirish'}
         </h1>
-        <p className="text-sm text-neutral-500 mt-1.5">
-          {isSignUp ? 'Hisob yarating va foydalanishni boshlang' : 'Hisobingizga kiring'}
+        <p className="text-xs text-neutral-500 mt-1">
+          {isSignUp ? 'Hisob yarating' : 'Hisobingizga kiring'}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
         {isSignUp && (
           <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1.5" htmlFor="name">F.I.O</label>
+            <label className="block text-[11px] font-medium text-neutral-600 mb-1" htmlFor="name">F.I.O</label>
             <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required
-              className="w-full h-11 px-3.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 text-[15px] placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+              className="w-full h-9 px-3 rounded-md border border-neutral-300 bg-white text-neutral-900 text-[13px] placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-900 focus:border-transparent transition-all"
               placeholder="Ism familiyangiz" />
           </div>
         )}
         <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-1.5" htmlFor="email">Email</label>
+          <label className="block text-[11px] font-medium text-neutral-600 mb-1" htmlFor="email">Email</label>
           <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-            className="w-full h-11 px-3.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 text-[15px] placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+            className="w-full h-9 px-3 rounded-md border border-neutral-300 bg-white text-neutral-900 text-[13px] placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-900 focus:border-transparent transition-all"
             placeholder="email@example.com" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-1.5" htmlFor="password">Parol</label>
+          <label className="block text-[11px] font-medium text-neutral-600 mb-1" htmlFor="password">Parol</label>
           <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
-            className="w-full h-11 px-3.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 text-[15px] placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+            className="w-full h-9 px-3 rounded-md border border-neutral-300 bg-white text-neutral-900 text-[13px] placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-neutral-900 focus:border-transparent transition-all"
             placeholder="••••••••" />
         </div>
 
-        {error && <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>}
+        {error && <div className="p-2 rounded-md bg-red-50 border border-red-200 text-[11px] text-red-700">{error}</div>}
 
         <button type="submit" disabled={loading}
-          className="w-full h-11 rounded-lg bg-neutral-900 text-white text-[15px] font-medium transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed">
-          {loading ? 'Bajarilmoqda...' : isSignUp ? "Ro'yxatdan o'tish" : 'Kirish'}
+          className="w-full h-9 rounded-md bg-neutral-900 text-white text-[13px] font-medium transition-colors hover:bg-neutral-800 disabled:opacity-50">
+          {loading ? '...' : isSignUp ? "Ro'yxatdan o'tish" : 'Kirish'}
         </button>
       </form>
 
-      <p className="text-center text-sm text-neutral-500 mt-6">
+      <p className="text-center text-[11px] text-neutral-500 mt-4">
         {isSignUp ? 'Hisobingiz bormi? ' : "Hisobingiz yo'qmi? "}
         <Link href={isSignUp ? '/sign-in' : '/sign-up'} className="text-neutral-900 font-medium hover:underline">
           {isSignUp ? 'Kirish' : "Ro'yxatdan o'tish"}

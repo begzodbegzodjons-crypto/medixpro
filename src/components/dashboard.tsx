@@ -22,7 +22,7 @@ export default function Dashboard({ userId }: { userId: string }) {
   const isAdmin = Boolean((session?.user as any)?.isAdmin)
 
   if (status === 'loading') {
-    return <div className="min-h-screen flex items-center justify-center"><div className="w-6 h-6 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin"></div></div>
+    return <div className="min-h-screen flex items-center justify-center"><div className="w-5 h-5 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin"></div></div>
   }
 
   const renderContent = () => {
@@ -43,7 +43,7 @@ export default function Dashboard({ userId }: { userId: string }) {
   return (
     <div className="min-h-screen bg-white">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} onSearch={() => setActiveTab('search')} />
-      <main className="max-w-5xl mx-auto px-4 py-6 md:py-8">{renderContent()}</main>
+      <main className="max-w-2xl mx-auto px-3 py-4 md:py-6">{renderContent()}</main>
     </div>
   )
 }
