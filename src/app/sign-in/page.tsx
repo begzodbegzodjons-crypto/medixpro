@@ -10,12 +10,10 @@ export default async function SignInPage() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4">
-      {/* Background image */}
       <div className="absolute inset-0 z-0">
-        <img src="/hero-teacher.png" alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-neutral-900/80"></div>
+        <img src="/hero-teacher.jpg" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-neutral-900/70"></div>
       </div>
-      {/* Form card */}
       <div className="relative z-10 w-full max-w-sm bg-white rounded-xl shadow-2xl p-8">
         <div className="text-center mb-6">
           <h1 className="text-xl font-semibold text-neutral-900 tracking-tight">UstozPro</h1>

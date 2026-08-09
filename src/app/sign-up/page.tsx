@@ -11,8 +11,8 @@ export default async function SignUpPage() {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4">
       <div className="absolute inset-0 z-0">
-        <img src="/hero-students.png" alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-neutral-900/80"></div>
+        <img src="/hero-students.jpg" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-neutral-900/70"></div>
       </div>
       <div className="relative z-10 w-full max-w-sm bg-white rounded-xl shadow-2xl p-8">
         <div className="text-center mb-6">
