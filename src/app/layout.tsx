@@ -5,7 +5,7 @@ import { AuthProvider } from "@/lib/auth-client";
 
 export const metadata: Metadata = {
   title: "UstozPro — O'qituvchilar uchun platforma",
-  description: "Testlar, dars rejalari va o'quv materiallari",
+  description: "Dars ishlanmalari, dars rejalari, testlar va o'quv materiallari",
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
@@ -21,13 +21,10 @@ export const viewport: Viewport = {
   themeColor: '#0a0a0a',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 5,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="uz" className="scroll-smooth" style={{ colorScheme: 'light' }} suppressHydrationWarning>
       <body className="antialiased bg-white text-neutral-900">

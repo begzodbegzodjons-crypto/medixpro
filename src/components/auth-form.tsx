@@ -43,33 +43,42 @@ export default function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto">
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-semibold text-neutral-900 tracking-tight">UstozPro</h1>
-        <p className="text-sm text-neutral-500 mt-1">
-          {isSignUp ? "Ro'yxatdan o'tish" : 'Hisobingizga kirish'}
+    <div className="w-full max-w-sm">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-neutral-900 tracking-tight">
+          {isSignUp ? "Ro'yxatdan o'tish" : 'Tizimga kirish'}
+        </h1>
+        <p className="text-sm text-neutral-500 mt-1.5">
+          {isSignUp ? 'Hisob yarating va foydalanishni boshlang' : 'Hisobingizga kiring'}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {isSignUp && (
           <div>
-            <label className="label" htmlFor="name">F.I.O</label>
-            <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required className="input" placeholder="Ism familiyangiz" />
+            <label className="block text-sm font-medium text-neutral-700 mb-1.5" htmlFor="name">F.I.O</label>
+            <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required
+              className="w-full h-11 px-3.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 text-[15px] placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+              placeholder="Ism familiyangiz" />
           </div>
         )}
         <div>
-          <label className="label" htmlFor="email">Email</label>
-          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="input" placeholder="email@example.com" />
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5" htmlFor="email">Email</label>
+          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+            className="w-full h-11 px-3.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 text-[15px] placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+            placeholder="email@example.com" />
         </div>
         <div>
-          <label className="label" htmlFor="password">Parol</label>
-          <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="input" placeholder="••••••••" />
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5" htmlFor="password">Parol</label>
+          <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
+            className="w-full h-11 px-3.5 rounded-lg border border-neutral-300 bg-white text-neutral-900 text-[15px] placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-all"
+            placeholder="••••••••" />
         </div>
 
         {error && <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>}
 
-        <button type="submit" disabled={loading} className="btn-primary w-full">
+        <button type="submit" disabled={loading}
+          className="w-full h-11 rounded-lg bg-neutral-900 text-white text-[15px] font-medium transition-colors hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed">
           {loading ? 'Bajarilmoqda...' : isSignUp ? "Ro'yxatdan o'tish" : 'Kirish'}
         </button>
       </form>
