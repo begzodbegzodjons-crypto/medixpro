@@ -1,53 +1,52 @@
-import mysql, { type Pool, type RowDataPacket, type ResultSetHeader, type PoolConnection } from 'mysql2/promise'
+import { connect, type Connection } from '@tidbcloud/serverless'
 
-/**
- * MySQL connection to TiDB Cloud via mysql2 driver.
- * Uses nodejs_compat_v2 flag in Cloudflare Workers for TCP/TLS support.
- */
+const FALLBACK_URL = 'mysql://2PS5aujUXSKBu38.root:j42agDdHIrQLJhwo@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/ustozpro'
 
-const DATABASE_URL = process.env.USTOZPRO_DATABASE_URL || process.env.DATABASE_URL || 'mysql://2PS5aujUXSKBu38.root:Wko2XOaA6o8m1AAU@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/ustozpro'
-
-const globalForDb = globalThis as unknown as { mysqlPool: Pool | undefined }
-
-function parseUrl(url: string) {
-  const parsed = new URL(url)
-  return { host: parsed.hostname, port: Number(parsed.port) || 4000, user: decodeURIComponent(parsed.username), password: decodeURIComponent(parsed.password), database: parsed.pathname.replace('/', '') }
+function getDatabaseUrl(): string {
+  const envUrl = process.env.USTOZPRO_DATABASE_URL || process.env.DATABASE_URL
+  // Only use env URL if it's a valid mysql:// URL (not file:// SQLite)
+  if (envUrl && envUrl.startsWith('mysql://')) return envUrl
+  return FALLBACK_URL
 }
 
-function getPool(): Pool {
-  if (!globalForDb.mysqlPool) {
-    const c = parseUrl(DATABASE_URL)
-    globalForDb.mysqlPool = mysql.createPool({
-      host: c.host, port: c.port, user: c.user, password: c.password, database: c.database,
-      ssl: { rejectUnauthorized: false },
-      waitForConnections: true, connectionLimit: 3, queueLimit: 10,
-      connectTimeout: 15000, enableKeepAlive: true, keepAliveInitialDelay: 10000,
-    })
+const DATABASE_URL = getDatabaseUrl()
+
+const globalForDb = globalThis as unknown as { tidbConn: Connection | undefined }
+
+function getConnection(): Connection {
+  if (!globalForDb.tidbConn) {
+    globalForDb.tidbConn = connect({ url: DATABASE_URL })
   }
-  return globalForDb.mysqlPool
+  return globalForDb.tidbConn
 }
 
 export const pool = {
-  execute: async (sql: string, params: any[] = []) => { const [r] = await getPool().execute(sql, params); return r },
-  query: async (sql: string, params: any[] = []) => { const [r] = await getPool().query(sql, params); return r },
-  end: async () => { await getPool().end() },
+  execute: async (sql: string, params: any[] = []) => getConnection().execute(sql, params),
+  query: async (sql: string, params: any[] = []) => getConnection().execute(sql, params),
+  end: async () => {},
 }
 
 export async function query<T = any>(sql: string, params: any[] = []): Promise<T> {
-  const [rows] = await getPool().execute(sql, params)
-  return rows as T
+  const result = await getConnection().execute(sql, params)
+  return (result as any).rows ?? result as T
 }
 
 export async function execute<T = any>(sql: string, params: any[] = []): Promise<T> {
-  const [result] = await getPool().execute(sql, params)
+  const result = await getConnection().execute(sql, params)
   return result as T
 }
 
-export async function transaction<T>(fn: (conn: PoolConnection) => Promise<T>): Promise<T> {
-  const conn = await getPool().getConnection()
-  try { await conn.beginTransaction(); const r = await fn(conn); await conn.commit(); return r }
-  catch (err) { await conn.rollback(); throw err }
-  finally { conn.release() }
+export async function transaction<T>(fn: (tx: { execute: (sql: string, params?: any[]) => Promise<any> }) => Promise<T>): Promise<T> {
+  const conn = getConnection()
+  const tx = await conn.begin()
+  try {
+    const result = await fn({ execute: async (sql: string, params: any[] = []) => tx.execute(sql, params) })
+    await tx.commit()
+    return result
+  } catch (err) {
+    await tx.rollback()
+    throw err
+  }
 }
 
 export const db = { pool, query, execute, transaction }

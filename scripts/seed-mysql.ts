@@ -32,7 +32,7 @@ async function main() {
 
   // Demo admin user
   const adminEmail = 'admin@ustozpro.uz'
-  const [adminRows] = await pool.query('SELECT id, isAdmin FROM User WHERE email = ?', [adminEmail]) as any
+  const adminRows: any = await query('SELECT id, isAdmin FROM User WHERE email = ?', [adminEmail]) as any
   let adminId: string
 
   if (adminRows.length === 0) {
@@ -54,7 +54,7 @@ async function main() {
 
   // Demo user
   const userEmail = 'user@ustozpro.uz'
-  const [userRows] = await pool.query('SELECT id FROM User WHERE email = ?', [userEmail]) as any
+  const userRows: any = await query('SELECT id FROM User WHERE email = ?', [userEmail]) as any
   if (userRows.length === 0) {
     const hashedPassword = await bcrypt.hash('user123', 10)
     const userId = generateId()
@@ -475,10 +475,10 @@ async function main() {
 
 main()
   .then(async () => {
-    await pool.end()
+    await new Promise(r => setTimeout(r, 100))
   })
   .catch(async (e) => {
     console.error('❌ Seeding failed:', e)
-    await pool.end()
+    await new Promise(r => setTimeout(r, 100))
     process.exit(1)
   })

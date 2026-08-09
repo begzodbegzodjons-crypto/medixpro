@@ -42,6 +42,7 @@
         "@reactuses/core": "^6.0.5",
         "@tanstack/react-query": "^5.82.0",
         "@tanstack/react-table": "^8.21.3",
+        "@tidbcloud/serverless": "^0.3.0",
         "bcryptjs": "^3.0.3",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -969,6 +970,8 @@
     "@tanstack/react-table": ["@tanstack/react-table@8.21.3", "https://registry.npmjs.com/@tanstack/react-table/-/react-table-8.21.3.tgz", { "dependencies": { "@tanstack/table-core": "8.21.3" }, "peerDependencies": { "react": ">=16.8", "react-dom": ">=16.8" } }, "sha512-5nNMTSETP4ykGegmVkhjcS8tTLW6Vl4axfEGQN3v0zdHYbK4UfoqfPChclTrJ4EoK9QynqAu9oUf8VEmrpZ5Ww=="],
 
     "@tanstack/table-core": ["@tanstack/table-core@8.21.3", "https://registry.npmjs.com/@tanstack/table-core/-/table-core-8.21.3.tgz", {}, "sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg=="],
+
+    "@tidbcloud/serverless": ["@tidbcloud/serverless@0.3.0", "", {}, "sha512-SrTqKNPuskV8GTm574d9otox8GAKXrsoF5NfQ5fiDirR+ao+eE6O2pfWr5zLhmFLQRbeuT8SKaUD+JOK0Z7gyQ=="],
 
     "@tsconfig/node18": ["@tsconfig/node18@1.0.3", "", {}, "sha512-RbwvSJQsuN9TB04AQbGULYfOGE/RnSFk/FLQ5b0NmDf5Kx2q/lABZbHQPKCO1vZ6Fiwkplu+yb9pGdLy1iGseQ=="],
 
