@@ -31,7 +31,7 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div>
       <div className="mb-6"><h2 className="text-lg font-medium text-neutral-900 mb-1">Admin paneli</h2><p className="text-sm text-neutral-500">Admin funktsiyalari va COIN paketlari</p></div>
       {message && (<div className={`mb-4 p-3 rounded-lg flex items-start gap-2 text-sm ${messageType === 'success' ? 'bg-neutral-100 text-neutral-900' : 'bg-red-50 border border-red-200 text-red-700'}`}>{messageType === 'success' ? <CheckCircle className="w-4 h-4 flex-shrink-0 mt-0.5" /> : <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />}<p>{message}</p></div>)}
       <div className="card p-5 mb-4">

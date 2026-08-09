@@ -43,7 +43,7 @@ export default function LessonMaterials() {
 
   if (viewingItem) {
     return (
-      <div className="max-w-2xl mx-auto">
+      <div>
         <button onClick={() => setViewingItem(null)} className="mb-4 flex items-center gap-1.5 text-sm text-neutral-600 hover:text-neutral-900"><ArrowLeft className="w-4 h-4" /> Ro'yhatga qayt</button>
         <div className="card p-6 md:p-8">
           {viewingItem.subject?.icon && <span className="text-2xl">{viewingItem.subject.icon}</span>}

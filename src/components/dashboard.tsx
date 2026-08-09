@@ -43,7 +43,7 @@ export default function Dashboard({ userId }: { userId: string }) {
   return (
     <div className="min-h-screen bg-white">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} onSearch={() => setActiveTab('search')} />
-      <main className="max-w-2xl mx-auto px-3 py-4 md:py-6">{renderContent()}</main>
+      <main className="px-4 py-6">{renderContent()}</main>
     </div>
   )
 }

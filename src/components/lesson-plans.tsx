@@ -37,7 +37,7 @@ export default function LessonPlans() {
   if (viewingPlan) {
     const content = viewingPlan.content || {}
     return (
-      <div className="max-w-3xl mx-auto">
+      <div>
         <button onClick={() => setViewingPlan(null)} className="mb-4 flex items-center gap-1.5 text-sm text-neutral-600 hover:text-neutral-900"><ArrowLeft className="w-4 h-4" /> Ro'yhatga qayt</button>
         <div className="card p-6 md:p-8">
           <div className="mb-4">

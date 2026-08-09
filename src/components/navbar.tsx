@@ -36,7 +36,7 @@ export default function Navbar({ activeTab, setActiveTab, isAdmin, onSearch }: N
 
   return (
     <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-neutral-200">
-      <div className="max-w-2xl mx-auto px-3">
+      <div className="px-4">
         <div className="flex items-center justify-between h-12">
           <div className="flex items-center gap-4">
             <button onClick={() => setActiveTab('home')} className="text-sm font-semibold text-neutral-900 tracking-tight whitespace-nowrap">
