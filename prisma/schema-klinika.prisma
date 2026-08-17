@@ -1,0 +1,265 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://2PS5aujUXSKBu38.root:j42agDdHIrQLJhwo@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/klinika_db?sslaccept=acceptinvalidcert"
+}
+
+model Clinic {
+  id              String   @id @default(cuid())
+  name            String
+  shortName       String
+  loginUsername   String?  @unique
+  password        String?
+  licenseNumber   String
+  inn             String
+  address         String   @db.Text
+  city            String
+  phone           String
+  email           String
+  telegram        String?
+  directorName    String
+  currency        String   @default("UZS")
+  currencySymbol  String   @default("so'm")
+  workingHours    String
+  logoUrl         String?
+  bankAccount     String?
+  bankName        String?
+  bankMfo         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  staff          Staff[]
+  patients       Patient[]
+  queue          QueueTicket[]
+  services       MedicalService[]
+  consultations  ConsultationRecord[]
+  labOrders      LabTestOrder[]
+  pharmacy       PharmacyItem[]
+  transactions   PaymentTransaction[]
+  wards          WardRoom[]
+}
+
+model Staff {
+  id                    String   @id @default(cuid())
+  clinicId             String
+  fullName              String
+  role                  String   @db.VarChar(30)
+  specialty             String?
+  roomNumber            String?
+  phone                 String
+  email                 String
+  username              String
+  password              String?
+  pinCode               String?
+  doctorActivityStatus  String?  @db.VarChar(20)
+  consultationFee       Float   @default(0)
+  commissionPercent    Float   @default(0)
+  status                String   @default("active") @db.VarChar(20)
+  workSchedule          String?
+  avatarUrl             String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+  @@index([username])
+}
+
+model Patient {
+  id              String   @id @default(cuid())
+  clinicId        String
+  patientNumber   String
+  fullName        String
+  birthDate       String
+  gender          String   @db.VarChar(10)
+  phone           String
+  address         String   @db.Text
+  passportOrPin   String
+  bloodGroup      String?
+  allergies       String?  @db.Text
+  chronicDiseases String?  @db.Text
+  emergencyName   String?
+  emergencyRelation String?
+  emergencyPhone  String?
+  notes           String?  @db.Text
+  balance         Float    @default(0)
+  totalVisits     Int      @default(0)
+  lastVisitDate   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+  @@index([phone])
+}
+
+model QueueTicket {
+  id              String   @id @default(cuid())
+  clinicId        String
+  ticketNumber    String
+  patientId       String
+  patientName     String
+  patientPhone    String
+  doctorId        String
+  doctorName      String
+  doctorSpecialty String
+  roomNumber       String
+  serviceId       String?
+  serviceName     String
+  price           Float    @default(0)
+  status          String   @default("waiting") @db.VarChar(20)
+  paymentStatus   String   @default("unpaid") @db.VarChar(20)
+  paidAmount      Float    @default(0)
+  estimatedWaitMinutes Int  @default(0)
+  calledAt        DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+  @@index([status])
+  @@index([doctorId])
+}
+
+model MedicalService {
+  id                   String   @id @default(cuid())
+  clinicId             String
+  name                 String
+  category             String   @db.VarChar(30)
+  price                Float    @default(0)
+  doctorSharePercent   Float    @default(0)
+  durationMinutes      Int      @default(30)
+  description          String?  @db.Text
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  clinic               Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+}
+
+model ConsultationRecord {
+  id              String   @id @default(cuid())
+  clinicId        String
+  patientId       String
+  doctorId        String
+  doctorName      String
+  doctorSpecialty String
+  date             DateTime
+  complaints      String   @db.Text
+  anamnesis       String   @db.Text
+  objectiveExam   String   @db.Text
+  icdCode         String?
+  diagnosis       String   @db.Text
+  treatmentPlan   String   @db.Text
+  prescriptions   String   @db.Text
+  orderedLabTests String?  @db.Text
+  orderedProcedures String? @db.Text
+  followUpDate    String?
+  status          String   @default("draft") @db.VarChar(20)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+  @@index([patientId])
+  @@index([doctorId])
+}
+
+model LabTestOrder {
+  id              String   @id @default(cuid())
+  clinicId        String
+  orderNumber     String
+  patientId       String
+  patientName     String
+  doctorId        String
+  doctorName      String
+  testType        String   @db.Text
+  parameters      String   @db.Text
+  conclusion      String?  @db.Text
+  status          String   @default("ordered") @db.VarChar(20)
+  price           Float    @default(0)
+  paymentStatus   String   @default("unpaid") @db.VarChar(20)
+  performedBy     String?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+  @@index([patientId])
+}
+
+model PharmacyItem {
+  id              String   @id @default(cuid())
+  clinicId        String
+  name            String
+  genericName     String?
+  category        String   @db.VarChar(30)
+  barcode         String
+  unit            String
+  stockQuantity   Int      @default(0)
+  minAlertQuantity Int     @default(10)
+  purchasePrice   Float    @default(0)
+  sellingPrice    Float    @default(0)
+  expiryDate      String
+  supplier        String?
+  location        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+}
+
+model PaymentTransaction {
+  id              String   @id @default(cuid())
+  clinicId        String
+  receiptNumber   String
+  patientId       String
+  patientName     String
+  items           String   @db.Text
+  subtotal        Float    @default(0)
+  discount        Float    @default(0)
+  totalAmount     Float    @default(0)
+  paymentMethod   String   @db.VarChar(20)
+  status          String   @default("completed") @db.VarChar(20)
+  cashierName     String
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+  @@index([patientId])
+}
+
+model WardRoom {
+  id              String   @id @default(cuid())
+  clinicId        String
+  roomNumber      String
+  department      String
+  floor           Int      @default(1)
+  type            String   @default("standard") @db.VarChar(20)
+  dailyRate       Float    @default(0)
+  facilities      String?  @db.Text
+  beds            String   @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  clinic          Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId])
+}
