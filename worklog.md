@@ -48,3 +48,31 @@ Stage Summary:
 - COIN paket kodlari: COIN-START100, COIN-STD500, COIN-PREM1000, COIN-MAX5000
 - Lint toza (0 xato)
 - Dev server 3000-portda ishlamoqda
+
+---
+Task ID: medixpro-fix
+Agent: super-z (main agent)
+Task: MedixPro saytini ishlaydigan holatga keltirish - bundle optimizatsiyasi va deploy
+
+Work Log:
+- GitHub'dan medixpro repo klon qilindi (/home/z/my-project/medixpro-deploy/)
+- Holat tahlili: JS bundle 2.1MB (565KB gzipped), sayt 10-20s yuklanardi
+- package.json ga @tidbcloud/serverless qo'shildi (yetishmayotgan edi)
+- vite.config.ts ga manualChunks qo'shildi: react-vendor, ui-vendor, charts-vendor
+- index.html ga MedixPro brendingli loading indicator (logo + spinner) qo'shildi
+- PatientHistoryCentralView.tsx da html2pdf.js dinamik importga o'tildi (985KB faqat PDF chiqarishda yuklanadi)
+- bun install + bun run build muvaffaqiyatli
+- wrangler orqali Cloudflare Workers ga deploy qilindi
+- agent-browser bilan to'liq test qilindi:
+  * Login sahifasi to'g'ri ko'rinadi (shifonur/123)
+  * Login -> Dashboard to'liq ishlamoqda (Dr. Alisher Qodirov)
+  * Reception, Shifokor, Analytics (recharts bilan) hammasi OK
+  * Hech qanday runtime error yo'q
+
+Stage Summary:
+- Sayt to'liq ishlaydigan holatda: https://medixpro.mirzalimovbegzod8.workers.dev
+- Initial bundle 565KB -> 297KB gzipped (50% kichraytirildi)
+- html2pdf chunk endi faqat PDF eksport vaqtida yuklanadi
+- Login: shifonur / 123
+- Barcha 13 ta view ishlaydi: Dashboard, Reception, PatientHistory, Doctor, Wards, Cashier, Lab, Pharmacy, Staff, Analytics, Settings, QueueTV, Printer
+- TiDB Cloud bilan sinxronizatsiya ishlayapti (clinic_shifo_nur da 3 staff, 1 patient, 6 services, 2 wards)
