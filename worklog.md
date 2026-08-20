@@ -76,3 +76,35 @@ Stage Summary:
 - Login: shifonur / 123
 - Barcha 13 ta view ishlaydi: Dashboard, Reception, PatientHistory, Doctor, Wards, Cashier, Lab, Pharmacy, Staff, Analytics, Settings, QueueTV, Printer
 - TiDB Cloud bilan sinxronizatsiya ishlayapti (clinic_shifo_nur da 3 staff, 1 patient, 6 services, 2 wards)
+
+---
+Task ID: medixpro-mobile-fix
+Agent: super-z (main agent)
+Task: Telefonda qora ekran muammosini tuzatish
+
+Work Log:
+- Tahlil: server to'g'ri ishlamoqda - desktop browser da sayt to'liq yuklanmoqda
+- Sabab aniqlandi: telefonda ESKI BUZILGAN JS bundle cache bo'lib qolgan
+  * 20-avgust 08:44-10:02 orasidagi 7 marta urinishdan qolgan eski JS
+  * Cloudflare Assets binding cache-control headerlarni o'rnatgan: "public, max-age=0, must-revalidate"
+  * Brauzerlar har doim ham revalidate qilmaydi - ayniqsa telefonda
+- Tuzatish:
+  * wrangler.toml ga run_worker_first = true qo'shildi
+  * worker.js da HTML uchun: Cache-Control: no-cache, no-store, must-revalidate
+  * worker.js da /assets/* uchun: Cache-Control: public, max-age=31536000, immutable
+  * worker.js ga CORS preflight handler qo'shildi
+  * index.html ga no-cache meta taglar qo'shildi
+  * index.html ga progress bar (yuklanish ko'rsatkichi)
+  * index.html ga 25s fallback UI: "Yuklashda xatolik" + "Qayta urinish" tugmasi
+- Test (iPhone 15 simulatsiyasi):
+  * Login sahifasi ~10s da yuklanadi
+  * Login -> Dashboard to'liq ishlaydi
+  * 13 ta view hammasi OK
+  * Hech qanday JS xato yo'q
+
+Stage Summary:
+- Sayt endi mobil qurilmalarda ham ishlaydi
+- Eski cache endi muammo emas - HTML har doim yangi keladi
+- Fallback UI bilan hech qachon faqat qora ekran ko'rinmaydi
+- Agar JS yuklanmasa, 25s dan keyin xato xabari + retry tugmasi chiqadi
+- Login: shifonur / 123
