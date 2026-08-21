@@ -130,7 +130,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="/assets/app.css?v=20260821">
+    <link rel="stylesheet" href="/assets/app.css?v=1787298222">
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col"><div id="cf-loader"><div><div class="spinner"></div><div class="text">ClinicFlow ERP yuklanmoqda...</div></div></div>
 <!-- Header (Suppressed Global Nav, Transactional Mode) -->
@@ -355,8 +355,32 @@
         }
 
         function submitForm() {
-            alert("Klinika muvaffaqiyatli ro'yxatdan o'tdi!");
-            // Handle form submission logic here
+            const allInputs = Array.from(document.querySelectorAll('input'));
+            const data = {};
+            allInputs.forEach((inp, idx) => {
+                const ph = (inp.placeholder || '').toLowerCase();
+                const val = inp.value.trim();
+                if (ph.includes('shifo') && !data.name) data.name = val;
+                else if (ph.includes('mchj') && !data.shortName) data.shortName = val;
+                else if (ph.includes('yunusobod') || (ph.includes('manzil') && !data.address)) data.address = val;
+                else if (ph.includes('123456789') || (ph.includes('stir') && !data.inn)) data.inn = val;
+                else if (ph.includes('+998') || (inp.type === 'tel' && !data.phone)) data.phone = val;
+                else if (inp.type === 'email') data.email = val;
+                else if (inp.type === 'password' && !data.password) data.password = val;
+                else if (inp.type === 'password' && !data.adminPassword) data.adminPassword = val;
+                else if (!data.name) data.name = val;
+                else if (!data.directorName) data.directorName = val;
+                else if (!data.adminUsername) data.adminUsername = val;
+            });
+            if (!data.loginUsername) data.loginUsername = (data.name || 'clinic').toLowerCase().replace(/\s+/g, '_');
+            if (!data.password) data.password = '123';
+            if (!data.adminName) data.adminName = data.directorName || 'Administrator';
+            if (!data.adminPassword) data.adminPassword = data.password;
+            if (window.ClinicFlow) {
+                window.ClinicFlow.handleRegisterClinic(data);
+            } else {
+                alert('ClinicFlow API yuklanmadi. Sahifani yangilang.');
+            }
         }
         
         function selectPlan(element) {
@@ -377,7 +401,7 @@
             icon.classList.remove('text-outline-variant');
         }
     </script>
-    <script src="/assets/app.js?v=20260821"></script>
+    <script src="/assets/app.js?v=1787298222"></script>
 
     <script>
         window.addEventListener('load', function() {
