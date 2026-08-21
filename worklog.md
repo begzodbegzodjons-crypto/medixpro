@@ -454,3 +454,53 @@ Stage Summary:
 - JS bundle 79% kichraydi (94KB)
 - Error boundary + global error handler - endi hech qachon qora ekran ko'rinmaydi
 - Sayt: https://medixpro.mirzalimovbegzod8.workers.dev
+
+---
+Task ID: clinicpro-error-recovery
+Agent: super-z (main agent)
+Task: "Saytda xatolik yuz berdi" xatosini tuzatish
+
+Tahlil:
+- Foydalanuvchi ErrorBoundary sahifasini ko'rdi: "Saytda xatolik yuz berdi"
+- Bu nima degani: React render paytida haqiqiy xato yuz berdi
+- Sabab aniqlandi: localStorage'da ESKI app'dan qolgan buzilgan ma'lumotlar
+  * Eski medixpro_clinic_data_xxx kalitlari buzilgan JSON yoki mos kelmaydigan struktura
+  * StorageService.getClinicData() bu ma'lumotlarni parse qilganda xato otib ketadi
+  * React ErrorBoundary ushlab, xato sahifasini ko'rsatadi
+
+TUZATISH:
+1. App.tsx:
+   - safeGetClinicId() - try/catch bilan, xato bo'lsa null qaytaradi
+   - safeGetClinicData() - try/catch bilan, xato bo'lsa minimal default state qaytaradi
+   - safeGetActiveClinicId() - fallback 'clinic_shifo_nur' qaytaradi
+   - Barcha useState init funksiyalari defensive
+2. main.tsx - Smart ErrorBoundary:
+   - 'Qayta urinish' tugmasi - retryCount bilan qayta urinadi
+   - 'Ma'lumotlarni tozalash' tugmasi - faqat medixpro_*/klinika_* kalitlarini o'chiradi va qayta yuklaydi
+   - Data xatolarni aniqlaydi (JSON parse, undefined, null) va tegishli xabar ko'rsatadi
+   - Texnik ma'lumot (error message + stack) details ichida
+3. Global window.error handler:
+   - Agar React umuman render qilinmasa, "Ma'lumotlarni tozalash" tugmasi ko'rsatadi
+4. Eski JS fayllar (index-DYuQm4xc.js, index-D9dpZ3JG.js, index-BY1KCzjM.js, index-DJbCwQ5Q.js)
+   yangi defensive kod bilan tiklandi
+
+Verify (browser test):
+- Pre-corrupted localStorage bilan test: sahifa to'liq render qilindi
+- Login: shifonur/123 - ishladi
+- 9 ta bo'lim hammasi ishladi:
+  * Qabulxona (27 buttons)
+  * Shifokor Kabineti (35 buttons)
+  * Kassa (26 buttons)
+  * Xodimlar (50 buttons)
+  * Hisobotlar (17 buttons)
+  * Sozlamalar (21 buttons)
+  * Dorixona (23 buttons)
+  * Laboratoriya (24 buttons)
+  * Palatalar (23 buttons)
+- 0 xato, 0 warning
+
+Stage Summary:
+- "Saytda xatolik" muammosi bartaraf etildi
+- Endi buzilgan localStorage bilan ham sahifa ishlaydi
+- Foydalanuvchi xato ko'rsa, "Ma'lumotlarni tozalash" tugmasi bilan tuzatishi mumkin
+- Sayt: https://medixpro.mirzalimovbegzod8.workers.dev

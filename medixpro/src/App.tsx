@@ -60,15 +60,63 @@ function ViewLoader() {
 }
 
 export default function App() {
+  // Safe wrappers for storage calls
+  const safeGetClinicId = (): string | null => {
+    try { return StorageService.getAuthenticatedClinicId(); } 
+    catch { return null; }
+  };
+  const safeGetClinicData = (id: string): ClinicState => {
+    try { return StorageService.getClinicData(id); }
+    catch (e) {
+      console.warn('getClinicData failed, using defaults:', e);
+      // Return minimal safe state
+      return {
+        currentClinic: StorageService.getClinics()[0] || {
+          id: 'clinic_shifo_nur',
+          name: 'Shifo Nur Medical Center',
+          shortName: 'Shifo Nur',
+          loginUsername: 'shifonur',
+          password: '123',
+          createdAt: new Date().toISOString(),
+        } as ClinicProfile,
+        currentUser: null,
+        staffList: [],
+        patients: [],
+        queue: [],
+        wards: [],
+        services: [],
+        consultations: [],
+        labOrders: [],
+        pharmacy: [],
+        transactions: [],
+        printerConfig: {
+          printerName: 'Xprinter XP-Q800',
+          connectionType: 'browser',
+          paperWidth: '80mm',
+          ipAddress: '192.168.1.200',
+          port: 9100,
+          autoCut: true,
+          beepOnPrint: true,
+          customHeader: 'ClinicFlow ERP',
+          customFooter: '',
+          copiesCount: 1,
+          printLogo: true,
+          printQrCode: true,
+        },
+      };
+    }
+  };
+
   // 1. Authenticated Clinic ID (Tenant isolation - zero visibility of other clinics)
-  const [authenticatedClinicId, setAuthenticatedClinicId] = useState<string | null>(() => {
-    return StorageService.getAuthenticatedClinicId();
-  });
+  const [authenticatedClinicId, setAuthenticatedClinicId] = useState<string | null>(safeGetClinicId);
   
   // Active Clinic Data State (isolated to current authenticated clinic)
   const [clinicData, setClinicData] = useState<ClinicState>(() => {
-    const authId = StorageService.getAuthenticatedClinicId() || StorageService.getActiveClinicId();
-    return StorageService.getClinicData(authId);
+    const authId = safeGetClinicId() || (() => {
+      try { return StorageService.getActiveClinicId(); }
+      catch { return 'clinic_shifo_nur'; }
+    })();
+    return safeGetClinicData(authId);
   });
 
   // Custom Disease Protocols
@@ -83,7 +131,11 @@ export default function App() {
 
   // Current Staff User within this authenticated clinic
   const [currentUser, setCurrentUser] = useState<StaffMember | null>(() => {
-    return clinicData.currentUser || clinicData.staffList[0] || null;
+    try {
+      return clinicData.currentUser || clinicData.staffList[0] || null;
+    } catch {
+      return null;
+    }
   });
 
   // Navigation Active View
