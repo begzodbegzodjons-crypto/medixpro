@@ -1,312 +1,515 @@
-<!DOCTYPE html>
-
-<html lang="uz"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ClinicFlow ERP - Tizimga kirish</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "on-error-container": "#93000a",
-                      "outline": "#737784",
-                      "on-secondary-fixed": "#002020",
-                      "surface-bright": "#f7f9fb",
-                      "on-surface-variant": "#434653",
-                      "surface-variant": "#e0e3e5",
-                      "error-container": "#ffdad6",
-                      "tertiary-fixed": "#d3e4fe",
-                      "on-background": "#191c1e",
-                      "surface-container": "#eceef0",
-                      "primary-fixed-dim": "#b0c6ff",
-                      "on-tertiary-container": "#bfd0ea",
-                      "on-tertiary-fixed-variant": "#38485d",
-                      "on-primary-container": "#bcceff",
-                      "on-error": "#ffffff",
-                      "primary-fixed": "#d9e2ff",
-                      "secondary-container": "#90efef",
-                      "primary-container": "#0f52ba",
-                      "on-tertiary-fixed": "#0b1c30",
-                      "on-secondary-fixed-variant": "#004f4f",
-                      "background": "#f7f9fb",
-                      "surface": "#f7f9fb",
-                      "on-primary": "#ffffff",
-                      "surface-container-highest": "#e0e3e5",
-                      "tertiary-container": "#49596f",
-                      "surface-container-lowest": "#ffffff",
-                      "on-primary-fixed-variant": "#00419c",
-                      "on-surface": "#191c1e",
-                      "inverse-primary": "#b0c6ff",
-                      "surface-container-high": "#e6e8ea",
-                      "on-primary-fixed": "#001945",
-                      "tertiary": "#324257",
-                      "on-secondary-container": "#006e6e",
-                      "surface-dim": "#d8dadc",
-                      "secondary": "#006a6a",
-                      "outline-variant": "#c3c6d5",
-                      "surface-container-low": "#f2f4f6",
-                      "tertiary-fixed-dim": "#b7c8e1",
-                      "primary": "#003c90",
-                      "inverse-surface": "#2d3133",
-                      "secondary-fixed-dim": "#76d6d5",
-                      "on-secondary": "#ffffff",
-                      "secondary-fixed": "#93f2f2",
-                      "on-tertiary": "#ffffff",
-                      "inverse-on-surface": "#eff1f3",
-                      "error": "#ba1a1a",
-                      "surface-tint": "#1d59c1"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "spacing": {
-                      "container-max": "1440px",
-                      "lg": "24px",
-                      "md": "16px",
-                      "gutter": "20px",
-                      "base": "4px",
-                      "xl": "32px",
-                      "xs": "4px",
-                      "sm": "8px"
-              },
-              "fontFamily": {
-                      "data-mono": [
-                              "Inter"
-                      ],
-                      "display-lg": [
-                              "Inter"
-                      ],
-                      "body-lg": [
-                              "Inter"
-                      ],
-                      "headline-sm": [
-                              "Inter"
-                      ],
-                      "headline-md": [
-                              "Inter"
-                      ],
-                      "label-bold": [
-                              "Inter"
-                      ],
-                      "body-sm": [
-                              "Inter"
-                      ],
-                      "body-md": [
-                              "Inter"
-                      ]
-              },
-              "fontSize": {
-                      "data-mono": [
-                              "14px",
-                              {
-                                      "lineHeight": "20px",
-                                      "fontWeight": "500"
-                              }
-                      ],
-                      "display-lg": [
-                              "36px",
-                              {
-                                      "lineHeight": "44px",
-                                      "letterSpacing": "-0.02em",
-                                      "fontWeight": "700"
-                              }
-                      ],
-                      "body-lg": [
-                              "16px",
-                              {
-                                      "lineHeight": "24px",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "headline-sm": [
-                              "20px",
-                              {
-                                      "lineHeight": "28px",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "headline-md": [
-                              "24px",
-                              {
-                                      "lineHeight": "32px",
-                                      "letterSpacing": "-0.01em",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "label-bold": [
-                              "12px",
-                              {
-                                      "lineHeight": "16px",
-                                      "letterSpacing": "0.05em",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "body-sm": [
-                              "13px",
-                              {
-                                      "lineHeight": "18px",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "body-md": [
-                              "14px",
-                              {
-                                      "lineHeight": "20px",
-                                      "fontWeight": "400"
-                              }
-                      ]
-              }
-      },
-          },
-        }
-    </script>
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ClinicFlow ERP - Klinika Boshqaruv Tizimi</title>
+<meta name="description" content="Klinika, shifoxona va poliklinikalar uchun yagona boshqaruv tizimi" />
+<meta name="theme-color" content="#003c90" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/app.css?v=20260822" />
 <style>
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-        
-        input:focus {
-            box-shadow: 0 0 0 2px rgba(0, 60, 144, 0.2);
-        }
-    </style>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="/assets/app.css?v=1787298222">
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #f7f9fb;
+    color: #191c1e;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    height: 100vh;
+  }
+  #app { display: flex; height: 100vh; }
+  
+  /* === Sidebar === */
+  .sidebar {
+    width: 240px;
+    background: #003c90;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+  }
+  .sidebar-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #fff 0%, #b0c6ff 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #003c90;
+    font-weight: 800;
+    font-size: 16px;
+  }
+  .sidebar-logo-text {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .sidebar-logo-text span { color: #b0c6ff; }
+  .sidebar-clinic {
+    margin-top: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
+  .sidebar-clinic-name { color: white; font-weight: 600; }
+  
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 8px;
+  }
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: all 0.15s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+  .nav-item.active { background: rgba(255,255,255,0.15); color: white; }
+  .nav-item .material-symbols-outlined { font-size: 20px; }
+  .nav-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    padding: 16px 12px 8px;
+    letter-spacing: 0.05em;
+  }
+  
+  .sidebar-footer {
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+  }
+  .user-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #b0c6ff 0%, #003c90 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-size: 13px; font-weight: 600; color: white; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-role { font-size: 11px; color: rgba(255,255,255,0.6); }
+  
+  /* === Main content === */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .topbar {
+    height: 56px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-title { font-size: 16px; font-weight: 700; color: #003c90; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    border: none;
+    color: #434653;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .icon-btn:hover { background: #e2e8f0; }
+  
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f7f9fb;
+  }
+  
+  /* === Login page === */
+  .login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #003c90 0%, #0f52ba 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .login-logo-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #003c90 0%, #0f52ba 100%);
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .login-logo h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: #003c90;
+  }
+  .login-logo p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #64748b;
+  }
+  
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #434653;
+  }
+  .form-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #c3c6d5;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    background: white;
+    transition: all 0.15s ease;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: #003c90;
+    box-shadow: 0 0 0 3px rgba(0,60,144,0.1);
+  }
+  .btn {
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: #003c90;
+    color: white;
+    width: 100%;
+  }
+  .btn-primary:hover { background: #002860; transform: translateY(-1px); }
+  .btn-secondary {
+    background: white;
+    color: #003c90;
+    border: 1px solid #c3c6d5;
+  }
+  .btn-secondary:hover { background: #f1f5f9; }
+  .btn-danger { background: #ba1a1a; color: white; }
+  .btn-success { background: #006a6a; color: white; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  
+  .demo-info {
+    margin-top: 20px;
+    padding: 12px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #434653;
+  }
+  .demo-info strong { color: #003c90; }
+  
+  /* === Stat cards === */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+  }
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #191c1e;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  
+  .panel {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+  }
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #003c90;
+    margin: 0;
+  }
+  
+  /* === Tables === */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    background: #f1f5f9;
+    color: #434653;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  th:first-child { border-radius: 6px 0 0 0; }
+  th:last-child { border-radius: 0 6px 0 0; }
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #191c1e;
+  }
+  tr:hover { background: #f9fafb; }
+  
+  /* === Badges === */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-info { background: #dbeafe; color: #1e40af; }
+  .badge-success { background: #d1fae5; color: #065f46; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+  
+  /* === Modal === */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fade-in 0.15s ease;
+  }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: slide-up 0.2s ease;
+  }
+  @keyframes slide-up { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #003c90;
+    margin: 0 0 16px;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  /* === Toast === */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    background: #003c90;
+    color: white;
+    padding: 14px 22px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-size: 14px;
+    font-weight: 500;
+    pointer-events: auto;
+    max-width: 380px;
+    animation: slide-in 0.3s ease;
+  }
+  .toast.success { background: #006a6a; }
+  .toast.error { background: #ba1a1a; }
+  .toast.warning { background: #b45309; }
+  @keyframes slide-in {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  /* === Loader === */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: #f7f9fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+  }
+  #loader.hidden { display: none; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #003c90;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  
+  /* === View transition === */
+  .view {
+    animation: view-in 0.2s ease;
+  }
+  @keyframes view-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* === Mobile === */
+  .mobile-toggle { display: none; }
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      z-index: 100;
+      transform: translateX(-100%);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .mobile-toggle { display: flex; }
+    .content { padding: 12px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .stat-card { padding: 12px; }
+    .stat-value { font-size: 18px; }
+  }
+  
+  /* === Material Symbols === */
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  /* === Print === */
+  @media print {
+    .sidebar, .topbar, .icon-btn { display: none !important; }
+  }
+</style>
 </head>
-<body class="bg-surface text-on-surface h-screen flex items-center justify-center font-body-md overflow-hidden antialiased selection:bg-primary-container selection:text-on-primary-container"><div id="cf-loader"><div><div class="spinner"></div><div class="text">ClinicFlow ERP yuklanmoqda...</div></div></div>
-<!-- Ambient Background Texture -->
-<div class="fixed inset-0 z-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#003c90 1px, transparent 1px); background-size: 24px 24px;"></div>
-<!-- Decorative Gradient Blobs -->
-<div class="fixed top-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-primary-fixed/40 blur-3xl -z-10 mix-blend-multiply"></div>
-<div class="fixed bottom-[-10%] left-[-5%] w-[50vw] h-[50vw] rounded-full bg-secondary-fixed/40 blur-3xl -z-10 mix-blend-multiply"></div>
-<main class="w-full max-w-[1000px] h-[600px] flex rounded-xl overflow-hidden shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),_0_8px_10px_-6px_rgba(0,0,0,0.1)] bg-surface-container-lowest border border-outline-variant z-10 mx-md">
-<!-- Left Side: Information & Branding -->
-<div class="hidden md:flex flex-col justify-between w-5/12 bg-surface-container p-xl relative overflow-hidden border-r border-outline-variant">
-<!-- Branding -->
-<div class="z-10">
-<div class="flex items-center gap-sm mb-lg">
-<span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
-<h1 class="text-headline-md font-headline-md text-primary tracking-tight">ClinicFlow ERP</h1>
-</div>
-<p class="text-body-lg font-body-lg text-on-surface-variant max-w-sm">
-                    Klinikalar uchun yagona boshqaruv tizimi. Bemorlar, xodimlar va resurslarni samarali nazorat qiling.
-                </p>
-</div>
-<!-- Security Highlight -->
-<div class="z-10 space-y-md">
-<div class="flex items-start gap-sm bg-surface-container-lowest p-md rounded-lg border border-outline-variant shadow-sm">
-<span class="material-symbols-outlined text-secondary text-[24px]">shield_lock</span>
-<div>
-<h3 class="text-body-md font-label-bold text-on-surface mb-xs">Izolyatsiya qilingan ma'lumotlar bazasi</h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant">Har bir klinika o'zining shifrlangan, mutlaqo izolyatsiya qilingan ma'lumotlar bazasiga ega. Bu xavfsizlik va maxfiylikning eng yuqori darajasini ta'minlaydi.</p>
-</div>
-</div>
-<div class="flex items-center gap-xs text-body-sm font-body-sm text-on-surface-variant mt-sm">
-<span class="material-symbols-outlined text-[16px]">verified</span>
-<span>Tizim himoyalangan va ISO standartlariga mos.</span>
-</div>
-</div>
-<!-- Abstract Graphic representing security/data -->
-<div class="absolute bottom-0 right-0 opacity-10 pointer-events-none select-none">
-<svg fill="none" height="300" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" viewbox="0 0 24 24" width="300">
-<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-</svg>
-</div>
-</div>
-<!-- Right Side: Login Form -->
-<div class="w-full md:w-7/12 p-xl sm:p-lg flex flex-col justify-center bg-surface-container-lowest relative">
-<div class="max-w-[400px] w-full mx-auto">
-<!-- Mobile Branding (Hidden on Desktop) -->
-<div class="md:hidden flex items-center justify-center gap-sm mb-xl">
-<span class="material-symbols-outlined text-primary text-[24px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
-<h1 class="text-headline-sm font-headline-sm text-primary tracking-tight">ClinicFlow ERP</h1>
-</div>
-<div class="mb-lg">
-<h2 class="text-headline-md font-headline-md text-on-surface mb-xs">Tizimga kirish</h2>
-<p class="text-body-md font-body-md text-on-surface-variant">Klinika ma'lumotlarini boshqarish paneliga xush kelibsiz.</p>
-</div>
-<form class="space-y-md">
-<!-- Klinika ID -->
-<div>
-<label class="block text-label-bold font-label-bold text-on-surface mb-base uppercase" for="clinic_id">Klinika ID</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">apartment</span>
-<input class="w-full pl-xl pr-sm py-sm text-body-md font-body-md text-on-surface bg-surface border border-outline-variant rounded-lg focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-outline-variant h-[40px]" id="clinic_id" name="clinic_id" placeholder="KL-12345" type="text"/>
-</div>
-</div>
-<!-- Login -->
-<div>
-<label class="block text-label-bold font-label-bold text-on-surface mb-base uppercase" for="login">Login (Foydalanuvchi nomi)</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">person</span>
-<input class="w-full pl-xl pr-sm py-sm text-body-md font-body-md text-on-surface bg-surface border border-outline-variant rounded-lg focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-outline-variant h-[40px]" id="login" name="login" placeholder="admin_dr" type="text"/>
-</div>
-</div>
-<!-- Parol -->
-<div>
-<div class="flex justify-between items-center mb-base">
-<label class="block text-label-bold font-label-bold text-on-surface uppercase" for="password">Parol</label>
-<a class="text-label-bold font-label-bold text-primary hover:text-on-primary-fixed-variant transition-colors" href="#">Parolni unutdingizmi?</a>
-</div>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">lock</span>
-<input class="w-full pl-xl pr-[40px] py-sm text-body-md font-body-md text-on-surface bg-surface border border-outline-variant rounded-lg focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder:text-outline-variant h-[40px]" id="password" name="password" placeholder="••••••••" type="password"/>
-<button class="absolute right-sm top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface transition-colors focus:outline-none" type="button">
-<span class="material-symbols-outlined text-[20px]">visibility_off</span>
-</button>
-</div>
-</div>
-<!-- Submit Button -->
-<button class="w-full mt-lg h-[40px] bg-primary text-on-primary text-label-bold font-label-bold rounded-lg shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] hover:bg-on-primary-fixed-variant transition-colors flex justify-center items-center gap-xs uppercase" type="submit">
-<span>Kirish</span>
-<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</button>
-</form>
-<!-- Divider -->
-<div class="my-lg flex items-center">
-<div class="flex-grow border-t border-outline-variant"></div>
-<span class="px-md text-label-bold font-label-bold text-outline uppercase">yoki</span>
-<div class="flex-grow border-t border-outline-variant"></div>
-</div>
-<!-- Registration Link -->
-<div class="text-center">
-<p class="text-body-sm font-body-sm text-on-surface-variant">
-                        Tizimda hisobingiz yo'qmi? 
-                        <a class="text-primary font-label-bold font-label-bold hover:underline underline-offset-2 transition-all" href="#">Klinikani ro'yxatdan o'tkazish</a>
-</p>
-</div>
-<!-- Bottom Support Link -->
-<div class="absolute bottom-md left-0 w-full text-center">
-<a class="text-body-sm font-body-sm text-outline hover:text-on-surface transition-colors inline-flex items-center gap-xs" href="#">
-<span class="material-symbols-outlined text-[14px]">support_agent</span>
-                        Texnik yordam markazi
-                    </a>
-</div>
-</div>
-</div>
-</main>
-    <script src="/assets/app.js?v=1787298222"></script>
-
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                var loader = document.getElementById('cf-loader');
-                if (loader) {
-                    loader.classList.add('hidden');
-                    setTimeout(function() { loader.remove(); }, 350);
-                }
-            }, 200);
-        });
-    </script>
-</body></html>
+<body>
+<div id="loader"><div style="text-align:center;"><div class="spinner"></div><div style="color:#003c90;font-weight:600;font-size:14px;">ClinicFlow ERP yuklanmoqda...</div></div></div>
+<div id="root"></div>
+<div class="toast-container" id="toasts"></div>
+<script src="/assets/app.js?v=20260822"></script>
+</body>
+</html>

@@ -1,10 +1,20 @@
-/* ClinicFlow ERP - Complete App JavaScript v4 - all functions working */
+/* ClinicFlow ERP - Single Page Application v5
+   All views in one page - no reload, no flicker
+*/
 (function() {
   'use strict';
 
+  // === State ===
   const State = {
-    currentClinic: null, currentUser: null,
-    staffList: [], patients: [], queue: [], services: [], transactions: [], consultations: [],
+    currentClinic: null,
+    currentUser: null,
+    staffList: [],
+    patients: [],
+    queue: [],
+    services: [],
+    transactions: [],
+    consultations: [],
+    activeView: 'dashboard',
   };
 
   const DEFAULT_CLINIC = {
@@ -39,6 +49,7 @@
     lastVisitDate: new Date(Date.now() - 7 * 86400000).toISOString(), createdAt: new Date().toISOString(),
   };
 
+  // === Storage ===
   const Storage = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
@@ -73,26 +84,30 @@
     }
   }
 
+  // === Toast ===
   function toast(msg, type, duration) {
     type = type || 'info'; duration = duration || 3000;
-    let c = document.getElementById('cf-toast-container');
-    if (!c) { c = document.createElement('div'); c.id = 'cf-toast-container'; c.style.cssText = 'position:fixed;top:20px;right:20px;z-index:999999;display:flex;flex-direction:column;gap:8px;pointer-events:none;'; document.body.appendChild(c); }
-    const colors = { info: '#003c90', success: '#006a6a', error: '#ba1a1a', warning: '#b45309' };
+    const c = document.getElementById('toasts');
+    if (!c) return;
     const t = document.createElement('div');
-    t.style.cssText = 'background:' + colors[type] + ';color:white;padding:14px 22px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.2);font-size:14px;font-weight:500;pointer-events:auto;max-width:380px;font-family:Inter,sans-serif;animation:cf-slide-in 0.3s ease;';
+    t.className = 'toast ' + type;
     t.textContent = msg;
     c.appendChild(t);
-    setTimeout(() => { t.style.transition = 'all 0.3s ease'; t.style.opacity = '0'; t.style.transform = 'translateX(120%)'; setTimeout(() => t.remove(), 300); }, duration);
+    setTimeout(() => {
+      t.style.transition = 'all 0.3s ease';
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(120%)';
+      setTimeout(() => t.remove(), 300);
+    }, duration);
   }
 
-  let modalCounter = 0;
+  // === Modal ===
   function showModal(title, contentHtml, onAction, onActionText) {
-    modalCounter++;
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:1rem;';
+    overlay.className = 'modal-overlay';
     const modal = document.createElement('div');
-    modal.style.cssText = 'background:white;border-radius:12px;padding:24px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);font-family:Inter,sans-serif;';
-    modal.innerHTML = '<h3 style="margin:0 0 16px;color:#003c90;font-size:18px;font-weight:700;">' + title + '</h3><div style="margin-bottom:20px;color:#191c1e;font-size:14px;line-height:1.5;">' + contentHtml + '</div><div style="display:flex;gap:8px;justify-content:flex-end;"><button class="cf-cancel" style="padding:8px 16px;border:1px solid #c3c6d5;background:white;color:#434653;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500;">Bekor qilish</button><button class="cf-ok" style="padding:8px 16px;background:#003c90;color:white;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;">' + (onActionText || 'Tasdiqlash') + '</button></div>';
+    modal.className = 'modal';
+    modal.innerHTML = '<h3 class="modal-title">' + title + '</h3><div>' + contentHtml + '</div><div class="modal-actions"><button class="btn btn-secondary cf-cancel">Bekor qilish</button><button class="btn btn-primary cf-ok">' + (onActionText || 'Tasdiqlash') + '</button></div>';
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
     modal.querySelector('.cf-cancel').onclick = () => overlay.remove();
@@ -117,7 +132,7 @@
       State.currentUser = admin;
       saveState();
       toast('Tizimga muvaffaqiyatli kirildi! ' + admin.fullName, 'success');
-      setTimeout(() => window.location.href = '/dashboard', 1000);
+      setTimeout(() => navigate('dashboard'), 500);
       return true;
     }
     toast('Login yoki parol noto\'g\'ri. (Demo: shifonur / 123)', 'error');
@@ -134,7 +149,7 @@
     saveState();
     fetch('/api/clinic/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clinic: State.currentClinic }) }).catch(() => {});
     toast('Klinika muvaffaqiyatli ro\'yxatdan o\'tdi! ' + State.currentClinic.name, 'success');
-    setTimeout(() => window.location.href = '/dashboard', 1500);
+    setTimeout(() => navigate('dashboard'), 1000);
     return true;
   }
 
@@ -144,13 +159,14 @@
     if (s.pinCode !== pin && s.password !== pin && pin !== '1234') { toast('PIN noto\'g\'ri', 'error'); return false; }
     State.currentUser = s; saveState();
     toast('Xush kelibsiz, ' + s.fullName + '!', 'success');
-    const v = { admin: '/dashboard', doctor: '/doctor', reception: '/reception', cashier: '/cashier', lab_tech: '/patient-history', pharmacist: '/prescription-new' };
-    setTimeout(() => window.location.href = v[s.role] || '/dashboard', 1000);
+    const v = { admin: 'dashboard', doctor: 'doctor', reception: 'reception', cashier: 'cashier', lab_tech: 'patient-history', pharmacist: 'prescription-new' };
+    setTimeout(() => navigate(v[s.role] || 'dashboard'), 500);
     return true;
   }
 
-  function logout() { State.currentUser = null; State.currentClinic = null; Storage.clear(); toast('Tizimdan chiqildi', 'info'); setTimeout(() => window.location.href = '/', 600); }
+  function logout() { State.currentUser = null; State.currentClinic = null; Storage.clear(); toast('Tizimdan chiqildi', 'info'); render(); }
 
+  // === Patient ===
   function addPatient(data) {
     const p = { id: 'pat_' + Date.now(), clinicId: State.currentClinic?.id || 'clinic_shifo_nur', patientNumber: 'P-2026-' + String(State.patients.length + 1).padStart(3, '0'), ...data, createdAt: new Date().toISOString() };
     State.patients.push(p); saveState();
@@ -177,7 +193,7 @@
       saveState();
       const labels = { waiting: 'Kutilmoqda', in_progress: 'Qabul qilinmoqda', completed: 'Yakunlandi' };
       toast('Navbat ' + q.ticketNumber + ': ' + labels[status], 'info');
-      renderCurrentPage();
+      render();
     }
   }
 
@@ -198,7 +214,7 @@
     return s;
   }
 
-  function deleteStaff(staffId) { State.staffList = State.staffList.filter(s => s.id !== staffId); saveState(); toast('Xodim o\'chirildi', 'info'); }
+  function deleteStaff(staffId) { State.staffList = State.staffList.filter(s => s.id !== staffId); saveState(); toast('Xodim o\'chirildi', 'info'); render(); }
 
   function saveConsultation(patientId, diagnosis, prescription, notes) {
     const p = State.patients.find(x => x.id === patientId);
@@ -208,121 +224,154 @@
     return c;
   }
 
-  window.ClinicFlow = { State, Storage, toast, showModal, handleClinicLogin, handleRegisterClinic, handleStaffLogin, logout, addPatient, addToQueue, updateQueueStatus, addTransaction, addStaff, deleteStaff, saveConsultation };
+  window.ClinicFlow = { State, Storage, toast, showModal, handleClinicLogin, handleRegisterClinic, handleStaffLogin, logout, addPatient, addToQueue, updateQueueStatus, addTransaction, addStaff, deleteStaff, saveConsultation, navigate };
 
-  function hideLoader() { const l = document.getElementById('cf-loader'); if (l) { l.classList.add('hidden'); setTimeout(() => l.remove(), 350); } }
+  // === Navigation ===
+  function navigate(view) {
+    State.activeView = view;
+    if (view === 'logout') { logout(); return; }
+    render();
+  }
+  window.navigate = navigate;
 
-  function setupPage() {
-    initState();
-    const page = (window.location.pathname.split('/').pop() || 'index').replace('.html', '');
-
-    if (page !== 'index' && page !== 'dashboard' && page !== '' && !document.getElementById('back-to-dashboard')) {
-      const btn = document.createElement('div');
-      btn.id = 'back-to-dashboard';
-      btn.innerHTML = '<a href="/dashboard"><span style="font-size:18px;">←</span>Boshqaruv paneliga qaytish</a>';
-      document.body.appendChild(btn);
+  // === Render ===
+  function render() {
+    const root = document.getElementById('root');
+    if (!State.currentUser || !State.currentClinic) {
+      root.innerHTML = renderLoginView();
+      bindLoginForm();
+      return;
     }
-
-    setupLoginForm();
-    setupLogoutButtons();
-    setupActionButtons();
-    renderPageData(page);
-    hideLoader();
+    root.innerHTML = renderApp();
   }
 
-  function setupLoginForm() {
-    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
-    const form = document.querySelector('form');
-    if (!form || form.dataset.cfBound) return;
-    form.dataset.cfBound = '1';
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const loginEl = document.getElementById('login');
-      const passEl = document.getElementById('password');
-      const username = loginEl?.value || document.querySelector('input[type=text]')?.value || '';
-      const password = passEl?.value || document.querySelector('input[type=password]')?.value || '';
-      handleClinicLogin(username, password);
-    });
+  function renderLoginView() {
+    return '<div class="login-page"><div class="login-card"><div class="login-logo"><div class="login-logo-icon">CF</div><h1>ClinicFlow ERP</h1><p>Klinika Boshqaruv Tizimi</p></div><form id="login-form"><div class="form-group"><label class="form-label">Klinika logini</label><input type="text" id="login-username" class="form-input" placeholder="shifonur" value="shifonur" required /></div><div class="form-group"><label class="form-label">Parol</label><input type="password" id="login-password" class="form-input" placeholder="•••" value="123" required /></div><button type="submit" class="btn btn-primary">Tizimga kirish</button></form><div class="demo-info"><strong>Demo kirish:</strong> shifonur / 123<br/><strong>Yoki:</strong> hayatmed / 123, darmonplus / 123</div><div style="margin-top:16px;text-align:center;"><button class="btn btn-secondary" onclick="showRegisterModal()" style="width:100%;">+ Yangi klinika ro\'yxatdan o\'tkazish</button></div></div></div>';
   }
 
-  function setupLogoutButtons() {
-    document.querySelectorAll('a, button').forEach(btn => {
-      if (btn.dataset.cfLogoutBound) return;
-      const text = (btn.textContent || '').toLowerCase().trim();
-      const href = btn.getAttribute('href') || '';
-      if (text === 'chiqish' || text === 'logout' || text === "tizimdan chiqish" || href === '#logout' || href === '/logout') {
-        btn.dataset.cfLogoutBound = '1';
-        btn.addEventListener('click', (e) => { e.preventDefault(); logout(); });
-      }
-    });
+  function bindLoginForm() {
+    const form = document.getElementById('login-form');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const u = document.getElementById('login-username').value;
+        const p = document.getElementById('login-password').value;
+        handleClinicLogin(u, p);
+      });
+    }
   }
 
-  function setupActionButtons() {
-    document.querySelectorAll('button, a').forEach(btn => {
-      if (btn.dataset.cfActionBound) return;
-      const text = (btn.textContent || '').toLowerCase().trim();
-      // Add patient / New appointment
-      if (text.includes('yangi bemor') || text.includes("bemor qo'shish") || text.includes('new appointment') || text.includes('add patient')) {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', (e) => { e.preventDefault(); showAddPatientModal(); });
-      }
-      // New payment
-      else if (text.includes("yangi to'lov") || text.includes("to'lov qilish") || text.includes('new payment') || text.includes('create invoice')) {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', (e) => { e.preventDefault(); showPaymentModal(); });
-      }
-      // Add staff
-      else if (text.includes('xodim qo\'shish') || text.includes("yangi xodim") || text.includes('add staff') || text.includes('new staff')) {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', (e) => { e.preventDefault(); showAddStaffModal(); });
-      }
-      // Doctor: New Appointment / Finalize Visit
-      else if (text.includes('finalize visit') || text.includes('next patient') || text.includes('bemor qabul')) {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', (e) => { e.preventDefault(); showPatientIntakeModal(); });
-      }
-      // Print
-      else if (text === 'print' || text === 'chop etish' || text.includes('chop et') || text.includes('print record')) {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', (e) => { e.preventDefault(); toast('Chop etish oynasi ochilmoqda...', 'info'); setTimeout(() => window.print(), 500); });
-      }
-      // Save
-      else if (text === 'saqlash' || text === 'save' || text === 'saqla') {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', () => { setTimeout(() => toast('Saqlandi', 'success'), 100); });
-      }
-      // View All
-      else if (text.includes('barchasini ko\'rish') || text === 'view all' || text.includes('hammasini ko\'rish')) {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', (e) => {
-          const path = window.location.pathname;
-          if (path === '/' || path === '/dashboard' || path === '') { e.preventDefault(); window.location.href = '/patients'; }
-        });
-      }
-      // Clear/Tozalash
-      else if (text === 'clear' || text === 'tozalash') {
-        btn.dataset.cfActionBound = '1';
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const search = document.querySelector('input[type=text][placeholder*="qidirish"], input[type=text][placeholder*="search"], input[type=search]');
-          if (search) { search.value = ''; search.dispatchEvent(new Event('input')); }
-        });
-      }
-    });
+  function showRegisterModal() {
+    showModal("Yangi klinika ro'yxatdan o'tkazish", '<div style="display:flex;flex-direction:column;gap:12px;"><div class="form-group"><label class="form-label">Klinika nomi *</label><input id="reg-name" type="text" class="form-input" placeholder="Masalan: Akfa Medline"></div><div class="form-group"><label class="form-label">Qisqa nomi</label><input id="reg-short" type="text" class="form-input" placeholder="Akfa Medline"></div><div class="form-group"><label class="form-label">Manzil</label><input id="reg-address" type="text" class="form-input" placeholder="Toshkent, Yunusobod"></div><div class="form-group"><label class="form-label">Telefon</label><input id="reg-phone" type="tel" class="form-input" placeholder="+998 71 200-00-00"></div><div class="form-group"><label class="form-label">Klinika logini *</label><input id="reg-login" type="text" class="form-input" placeholder="akfamedline"></div><div class="form-group"><label class="form-label">Parol *</label><input id="reg-pass" type="password" class="form-input" placeholder="parol"></div><div class="form-group"><label class="form-label">Bosh shifokor F.I.SH</label><input id="reg-director" type="text" class="form-input" placeholder="Dr. Alisher Qodirov"></div></div>', (modal) => {
+      const data = { name: modal.querySelector('#reg-name').value.trim(), shortName: modal.querySelector('#reg-short').value.trim(), address: modal.querySelector('#reg-address').value.trim(), phone: modal.querySelector('#reg-phone').value.trim(), loginUsername: modal.querySelector('#reg-login').value.trim(), password: modal.querySelector('#reg-pass').value, directorName: modal.querySelector('#reg-director').value.trim() };
+      if (!data.name || !data.loginUsername || !data.password) { toast('Klinika nomi, login va parol majburiy', 'error'); return false; }
+      handleRegisterClinic(data);
+    }, "Ro'yxatdan o'tkazish");
+  }
+  window.showRegisterModal = showRegisterModal;
+
+  function renderApp() {
+    const view = State.activeView;
+    const roleLabels = { admin: 'Administrator', doctor: 'Shifokor', reception: 'Registratura', cashier: 'Kassir', lab_tech: 'Laborant', pharmacist: 'Farmasevt' };
+    const userInitials = (State.currentUser?.fullName || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const clinicName = State.currentClinic?.name || 'Klinika';
+    
+    const navItems = [
+      { section: 'Asosiy', items: [
+        { id: 'dashboard', icon: 'dashboard', label: 'Boshqaruv paneli' },
+        { id: 'reception', icon: 'how_to_reg', label: 'Qabulxona' },
+        { id: 'patients', icon: 'group', label: 'Bemorlar' },
+        { id: 'doctor', icon: 'stethoscope', label: 'Shifokor kabineti' },
+      ]},
+      { section: 'Moliya', items: [
+        { id: 'cashier', icon: 'payments', label: 'Kassa' },
+        { id: 'analytics', icon: 'analytics', label: 'Hisobotlar' },
+        { id: 'patient-history', icon: 'history_edu', label: 'Tibbiy qaydlar' },
+      ]},
+      { section: 'Boshqaruv', items: [
+        { id: 'staff', icon: 'badge', label: 'Xodimlar' },
+        { id: 'settings', icon: 'settings', label: 'Sozlamalar' },
+      ]},
+    ];
+
+    const navHtml = navItems.map(section => 
+      '<div class="nav-section-title">' + section.section + '</div>' +
+      section.items.map(item => '<button class="nav-item ' + (view === item.id ? 'active' : '') + '" onclick="navigate(\'' + item.id + '\')"><span class="material-symbols-outlined">' + item.icon + '</span>' + item.label + '</button>').join('')
+    ).join('') + '<div class="nav-section-title">Tizim</div><button class="nav-item" onclick="navigate(\'logout\')"><span class="material-symbols-outlined">logout</span>Chiqish</button>';
+    
+    return '<div id="app"><aside class="sidebar" id="sidebar"><div class="sidebar-header"><div class="sidebar-logo"><div class="sidebar-logo-icon">CF</div><div><div class="sidebar-logo-text">Clinic<span>Flow</span></div><div class="sidebar-clinic"><span class="sidebar-clinic-name">' + clinicName + '</span></div></div></div></div><nav class="sidebar-nav">' + navHtml + '</nav><div class="sidebar-footer"><div class="user-card"><div class="user-avatar">' + userInitials + '</div><div class="user-info"><div class="user-name">' + (State.currentUser?.fullName || '') + '</div><div class="user-role">' + (roleLabels[State.currentUser?.role] || State.currentUser?.role || '') + '</div></div></div></div></aside><div class="main"><div class="topbar"><div class="topbar-left"><button class="icon-btn mobile-toggle" onclick="document.getElementById(\'sidebar\').classList.toggle(\'open\')"><span class="material-symbols-outlined">menu</span></button><div class="topbar-title">' + getViewTitle(view) + '</div></div><div class="topbar-right"><button class="icon-btn" title="Qidirish"><span class="material-symbols-outlined">search</span></button><button class="icon-btn" title="Bildirishnomalar"><span class="material-symbols-outlined">notifications</span></button></div></div><div class="content"><div class="view">' + renderView(view) + '</div></div></div></div>';
   }
 
+  function getViewTitle(view) {
+    const titles = { dashboard: 'Boshqaruv paneli', reception: 'Qabulxona', patients: 'Bemorlar', doctor: 'Shifokor kabineti', cashier: 'Kassa', analytics: 'Hisobotlar', 'patient-history': 'Tibbiy qaydlar', staff: 'Xodimlar', settings: 'Sozlamalar' };
+    return titles[view] || 'ClinicFlow ERP';
+  }
+
+  function renderView(view) {
+    switch (view) {
+      case 'dashboard': return renderDashboard();
+      case 'reception': return renderReception();
+      case 'patients': return renderPatients();
+      case 'doctor': return renderDoctor();
+      case 'cashier': return renderCashier();
+      case 'analytics': return renderAnalytics();
+      case 'patient-history': return renderPatientHistory();
+      case 'staff': return renderStaff();
+      case 'settings': return renderSettings();
+      default: return renderDashboard();
+    }
+  }
+
+  function renderDashboard() {
+    const totalRev = State.transactions.reduce((s, t) => s + t.totalAmount, 0);
+    const waitingCount = State.queue.filter(q => q.status === 'waiting').length;
+    return '<div class="stats-grid"><div class="stat-card"><div class="stat-icon" style="background:#dbeafe;"><span class="material-symbols-outlined" style="color:#003c90;">payments</span></div><div class="stat-value">' + totalRev.toLocaleString() + '</div><div class="stat-label">Tushum (so\'m)</div></div><div class="stat-card"><div class="stat-icon" style="background:#fef3c7;"><span class="material-symbols-outlined" style="color:#92400e;">group</span></div><div class="stat-value">' + State.patients.length + '</div><div class="stat-label">Bemorlar</div></div><div class="stat-card"><div class="stat-icon" style="background:#d1fae5;"><span class="material-symbols-outlined" style="color:#065f46;">schedule</span></div><div class="stat-value">' + waitingCount + '</div><div class="stat-label">Navbatda kutilmoqda</div></div><div class="stat-card"><div class="stat-icon" style="background:#fdf2f8;"><span class="material-symbols-outlined" style="color:#9d174d;">badge</span></div><div class="stat-value">' + State.staffList.length + '</div><div class="stat-label">Xodimlar</div></div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">So\'nggi navbatlar</h3><button class="btn btn-primary btn-sm" onclick="showAddPatientModal()">+ Yangi bemor</button></div>' + (State.queue.length === 0 ? '<div style="text-align:center;padding:2rem;color:#64748b;">Hozircha navbat yo\'q</div>' : '<table><thead><tr><th>Navbat</th><th>Bemor</th><th>Shifokor</th><th>Xizmat</th><th>Narx</th><th>Holat</th></tr></thead><tbody>' + State.queue.slice(0, 8).map(q => '<tr><td><strong style="color:#003c90;">' + q.ticketNumber + '</strong></td><td>' + q.patientName + '</td><td>' + q.doctorName + '</td><td>' + q.serviceName + '</td><td>' + q.price.toLocaleString() + ' so\'m</td><td><span class="badge ' + (q.status === 'waiting' ? 'badge-warning' : q.status === 'in_progress' ? 'badge-info' : 'badge-success') + '">' + (q.status === 'waiting' ? 'Kutilmoqda' : q.status === 'in_progress' ? 'Qabulda' : 'Yakunlandi') + '</span></td></tr>').join('') + '</tbody></table>') + '</div>';
+  }
+
+  function renderReception() {
+    return '<div class="panel"><div class="panel-header"><h3 class="panel-title">Qabulxona - Bemorlarni navbatga yozish</h3><button class="btn btn-primary btn-sm" onclick="showAddPatientModal()">+ Yangi bemor qo\'shish</button></div>' + (State.queue.length === 0 ? '<div style="text-align:center;padding:3rem;color:#64748b;"><span class="material-symbols-outlined" style="font-size:48px;display:block;margin-bottom:8px;">how_to_reg</span>Hozircha navbat yo\'q.<br>"Yangi bemor qo\'shish" tugmasini bosing.</div>' : '<table><thead><tr><th>Navbat</th><th>Bemor</th><th>Telefon</th><th>Shifokor</th><th>Xizmat</th><th>Narx</th><th>Holat</th><th>Amal</th></tr></thead><tbody>' + State.queue.map(q => '<tr><td><strong style="color:#003c90;">' + q.ticketNumber + '</strong></td><td>' + q.patientName + '</td><td>' + (q.patientPhone || '-') + '</td><td>' + q.doctorName + '</td><td>' + q.serviceName + '</td><td>' + q.price.toLocaleString() + ' so\'m</td><td><span class="badge ' + (q.status === 'waiting' ? 'badge-warning' : q.status === 'in_progress' ? 'badge-info' : 'badge-success') + '">' + (q.status === 'waiting' ? 'Kutilmoqda' : q.status === 'in_progress' ? 'Qabulda' : 'Yakunlandi') + '</span></td><td>' + (q.status === 'waiting' ? '<button class="btn btn-secondary btn-sm" onclick="ClinicFlow.updateQueueStatus(\'' + q.id + '\',\'in_progress\')">Qabulga</button>' : q.status === 'in_progress' ? '<button class="btn btn-success btn-sm" onclick="ClinicFlow.updateQueueStatus(\'' + q.id + '\',\'completed\')">Yakunlash</button>' : '-') + '</td></tr>').join('') + '</tbody></table>') + '</div>';
+  }
+
+  function renderPatients() {
+    return '<div class="panel"><div class="panel-header"><h3 class="panel-title">Bemorlar ro\'yxati (' + State.patients.length + ')</h3><button class="btn btn-primary btn-sm" onclick="showAddPatientModal()">+ Yangi bemor</button></div>' + (State.patients.length === 0 ? '<div style="text-align:center;padding:3rem;color:#64748b;">Bemorlar yo\'q</div>' : '<table><thead><tr><th>№</th><th>F.I.SH</th><th>Telefon</th><th>Tug\'ilgan sana</th><th>Tashriflar</th></tr></thead><tbody>' + State.patients.map(p => '<tr><td><strong style="color:#003c90;">' + p.patientNumber + '</strong></td><td>' + p.fullName + '</td><td>' + p.phone + '</td><td>' + (p.birthDate || '-') + '</td><td>' + (p.totalVisits || 0) + '</td></tr>').join('') + '</tbody></table>') + '</div>';
+  }
+
+  function renderDoctor() {
+    const myQueue = State.currentUser?.role === 'doctor' ? State.queue.filter(q => q.doctorId === State.currentUser.id) : State.queue;
+    const waiting = myQueue.filter(q => q.status === 'waiting');
+    const inProgress = myQueue.filter(q => q.status === 'in_progress');
+    return '<div class="stats-grid"><div class="stat-card"><div class="stat-icon" style="background:#fef3c7;"><span class="material-symbols-outlined" style="color:#92400e;">schedule</span></div><div class="stat-value">' + waiting.length + '</div><div class="stat-label">Kutilmoqda</div></div><div class="stat-card"><div class="stat-icon" style="background:#dbeafe;"><span class="material-symbols-outlined" style="color:#1e40af;">medical_services</span></div><div class="stat-value">' + inProgress.length + '</div><div class="stat-label">Qabulda</div></div><div class="stat-card"><div class="stat-icon" style="background:#d1fae5;"><span class="material-symbols-outlined" style="color:#065f46;">check_circle</span></div><div class="stat-value">' + myQueue.filter(q => q.status === 'completed').length + '</div><div class="stat-label">Yakunlandi</div></div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">Bemorlar navbati</h3><button class="btn btn-primary btn-sm" onclick="showPatientIntakeModal()">+ Bemor qabul qilish</button></div>' + (myQueue.length === 0 ? '<div style="text-align:center;padding:3rem;color:#64748b;"><span class="material-symbols-outlined" style="font-size:48px;display:block;margin-bottom:8px;">stethoscope</span>Hozircha navbat yo\'q</div>' : myQueue.map(q => '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;background:' + (q.status === 'in_progress' ? '#dbeafe' : 'white') + ';"><div style="display:flex;gap:12px;align-items:center;"><span style="background:#003c90;color:white;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700;">' + q.ticketNumber + '</span><div><div style="font-weight:600;color:#191c1e;">' + q.patientName + '</div><div style="font-size:12px;color:#64748b;">' + q.doctorName + ' • ' + q.serviceName + ' • ' + q.price.toLocaleString() + ' so\'m</div></div></div><div style="display:flex;gap:8px;align-items:center;"><span class="badge ' + (q.status === 'waiting' ? 'badge-warning' : q.status === 'in_progress' ? 'badge-info' : 'badge-success') + '">' + (q.status === 'waiting' ? 'Kutilmoqda' : q.status === 'in_progress' ? 'Qabulda' : 'Yakunlandi') + '</span>' + (q.status === 'waiting' ? '<button class="btn btn-primary btn-sm" onclick="ClinicFlow.updateQueueStatus(\'' + q.id + '\',\'in_progress\')">Qabul qilish</button>' : q.status === 'in_progress' ? '<button class="btn btn-success btn-sm" onclick="showPatientIntakeModal()">Ko\'rib chiqish</button>' : '') + '</div></div>').join('')) + '</div>';
+  }
+
+  function renderCashier() {
+    const totalRev = State.transactions.reduce((s, t) => s + t.totalAmount, 0);
+    return '<div class="stats-grid"><div class="stat-card"><div class="stat-icon" style="background:#dbeafe;"><span class="material-symbols-outlined" style="color:#003c90;">payments</span></div><div class="stat-value">' + totalRev.toLocaleString() + '</div><div class="stat-label">Jami tushum (so\'m)</div></div><div class="stat-card"><div class="stat-icon" style="background:#d1fae5;"><span class="material-symbols-outlined" style="color:#065f46;">receipt</span></div><div class="stat-value">' + State.transactions.length + '</div><div class="stat-label">To\'lovlar soni</div></div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">So\'nggi to\'lovlar</h3><button class="btn btn-primary btn-sm" onclick="showPaymentModal()">+ Yangi to\'lov</button></div>' + (State.transactions.length === 0 ? '<div style="text-align:center;padding:3rem;color:#64748b;"><span class="material-symbols-outlined" style="font-size:48px;display:block;margin-bottom:8px;">payments</span>Hozircha to\'lovlar yo\'q</div>' : '<table><thead><tr><th>Chek №</th><th>Bemor</th><th>Xizmatlar</th><th>Summa</th><th>To\'lov turi</th><th>Sana</th></tr></thead><tbody>' + State.transactions.slice().reverse().slice(0, 20).map(t => '<tr><td><strong style="color:#003c90;">' + t.receiptNumber + '</strong></td><td>' + t.patientName + '</td><td>' + t.items.length + ' ta</td><td><strong>' + t.totalAmount.toLocaleString() + ' so\'m</strong></td><td><span class="badge badge-info">' + (t.paymentMethod === 'cash' ? 'Naqd' : t.paymentMethod === 'card' ? 'Karta' : 'O\'tkazma') + '</span></td><td>' + new Date(t.createdAt).toLocaleString('uz-UZ') + '</td></tr>').join('') + '</tbody></table>') + '</div>';
+  }
+
+  function renderAnalytics() {
+    const totalRev = State.transactions.reduce((s, t) => s + t.totalAmount, 0);
+    const cashRev = State.transactions.filter(t => t.paymentMethod === 'cash').reduce((s, t) => s + t.totalAmount, 0);
+    const cardRev = State.transactions.filter(t => t.paymentMethod === 'card').reduce((s, t) => s + t.totalAmount, 0);
+    return '<div class="stats-grid"><div class="stat-card"><div class="stat-icon" style="background:#dbeafe;"><span class="material-symbols-outlined" style="color:#003c90;">trending_up</span></div><div class="stat-value">' + totalRev.toLocaleString() + '</div><div class="stat-label">Jami tushum (so\'m)</div></div><div class="stat-card"><div class="stat-icon" style="background:#d1fae5;"><span class="material-symbols-outlined" style="color:#065f46;">group</span></div><div class="stat-value">' + State.patients.length + '</div><div class="stat-label">Bemorlar</div></div><div class="stat-card"><div class="stat-icon" style="background:#fef3c7;"><span class="material-symbols-outlined" style="color:#92400e;">medical_services</span></div><div class="stat-value">' + State.consultations.length + '</div><div class="stat-label">Konsultatsiyalar</div></div><div class="stat-card"><div class="stat-icon" style="background:#fdf2f8;"><span class="material-symbols-outlined" style="color:#9d174d;">badge</span></div><div class="stat-value">' + State.staffList.filter(s => s.role === 'doctor').length + '</div><div class="stat-label">Shifokorlar</div></div></div><div class="panel"><h3 class="panel-title" style="margin-bottom:16px;">To\'lov tahlili</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div style="padding:16px;background:#f0fdf4;border-radius:8px;"><div style="font-size:12px;color:#64748b;margin-bottom:4px;">Naqd tushum</div><div style="font-size:20px;font-weight:700;color:#006a6a;">' + cashRev.toLocaleString() + ' so\'m</div></div><div style="padding:16px;background:#f0f9ff;border-radius:8px;"><div style="font-size:12px;color:#64748b;margin-bottom:4px;">Karta tushum</div><div style="font-size:20px;font-weight:700;color:#003c90;">' + cardRev.toLocaleString() + ' so\'m</div></div></div></div>';
+  }
+
+  function renderPatientHistory() {
+    return '<div class="panel"><div class="panel-header"><h3 class="panel-title">Tibbiy qaydlar - Konsultatsiyalar (' + State.consultations.length + ')</h3></div>' + (State.consultations.length === 0 ? '<div style="text-align:center;padding:3rem;color:#64748b;"><span class="material-symbols-outlined" style="font-size:48px;display:block;margin-bottom:8px;">history_edu</span>Hozircha konsultatsiyalar yo\'q</div>' : State.consultations.slice().reverse().map(c => '<div style="padding:16px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:12px;"><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><strong style="color:#003c90;font-size:15px;">' + c.patientName + '</strong><span style="font-size:12px;color:#64748b;">' + new Date(c.date).toLocaleString('uz-UZ') + '</span></div><div style="font-size:13px;color:#434653;margin-bottom:4px;"><strong>Shifokor:</strong> ' + c.doctorName + '</div><div style="font-size:13px;color:#434653;margin-bottom:4px;"><strong>Diagnoz:</strong> ' + c.diagnosis + '</div>' + (c.prescription ? '<div style="font-size:13px;color:#434653;"><strong>Retsept:</strong> ' + c.prescription + '</div>' : '') + '</div>').join('')) + '</div>';
+  }
+
+  function renderStaff() {
+    return '<div class="panel"><div class="panel-header"><h3 class="panel-title">Xodimlar ro\'yxati (' + State.staffList.length + ')</h3><button class="btn btn-primary btn-sm" onclick="showAddStaffModal()">+ Yangi xodim qo\'shish</button></div><table><thead><tr><th>F.I.SH</th><th>Lavozim</th><th>Mutaxassislik</th><th>Telefon</th><th>Holat</th><th>Amal</th></tr></thead><tbody>' + State.staffList.map(s => { const roleLabels = { admin: 'Administrator', doctor: 'Shifokor', reception: 'Registratura', cashier: 'Kassir', lab_tech: 'Laborant', pharmacist: 'Farmasevt' }; return '<tr><td><strong>' + s.fullName + '</strong></td><td><span class="badge badge-info">' + (roleLabels[s.role] || s.role) + '</span></td><td>' + (s.specialty || '-') + '</td><td>' + (s.phone || '-') + '</td><td><span class="badge badge-success">' + (s.status === 'active' ? 'Faol' : 'Nofaol') + '</span></td><td><button class="btn btn-danger btn-sm" onclick="ClinicFlow.deleteStaff(\'' + s.id + '\')">O\'chirish</button></td></tr>'; }).join('') + '</tbody></table></div>';
+  }
+
+  function renderSettings() {
+    return '<div class="panel"><h3 class="panel-title" style="margin-bottom:16px;">Klinika ma\'lumotlari</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label class="form-label">Klinika nomi</label><input type="text" class="form-input" value="' + (State.currentClinic?.name || '') + '"></div><div class="form-group"><label class="form-label">Qisqa nomi</label><input type="text" class="form-input" value="' + (State.currentClinic?.shortName || '') + '"></div><div class="form-group"><label class="form-label">Telefon</label><input type="tel" class="form-input" value="' + (State.currentClinic?.phone || '') + '"></div><div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" value="' + (State.currentClinic?.email || '') + '"></div><div class="form-group"><label class="form-label">Manzil</label><input type="text" class="form-input" value="' + (State.currentClinic?.address || '') + '"></div><div class="form-group"><label class="form-label">Ish vaqti</label><input type="text" class="form-input" value="' + (State.currentClinic?.workingHours || '') + '"></div></div><div style="margin-top:16px;"><button class="btn btn-primary" onclick="ClinicFlow.toast(\'Saqlandi\', \'success\')">Saqlash</button></div></div>';
+  }
+
+  // === Modals ===
   function showAddPatientModal() {
     const doctors = State.staffList.filter(s => s.role === 'doctor');
     const services = State.services;
-    showModal('Yangi bemor qo\'shish va navbatga yozish', `
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">F.I.SH *</label><input id="pat-fullname" type="text" placeholder="Masalan: Rustam Karimov" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Telefon *</label><input id="pat-phone" type="tel" placeholder="+998 90 123-45-67" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Tug'ilgan sana</label><input id="pat-birth" type="date" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Shifokor tanlang *</label><select id="pat-doctor" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;">${doctors.map(d => '<option value="' + d.id + '">' + d.fullName + ' - ' + d.specialty + '</option>').join('')}</select></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Xizmat</label><select id="pat-service" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;">${services.map(s => '<option value="' + s.id + '" data-price="' + s.price + '">' + s.name + ' - ' + s.price.toLocaleString() + " so'm</option>").join('')}</select></div>
-      </div>
-    `, (modal) => {
+    showModal("Yangi bemor qo'shish", '<div style="display:flex;flex-direction:column;gap:12px;"><div class="form-group"><label class="form-label">F.I.SH *</label><input id="pat-fullname" type="text" class="form-input" placeholder="Masalan: Rustam Karimov"></div><div class="form-group"><label class="form-label">Telefon *</label><input id="pat-phone" type="tel" class="form-input" placeholder="+998 90 123-45-67"></div><div class="form-group"><label class="form-label">Tug\'ilgan sana</label><input id="pat-birth" type="date" class="form-input"></div><div class="form-group"><label class="form-label">Shifokor tanlang *</label><select id="pat-doctor" class="form-input">' + doctors.map(d => '<option value="' + d.id + '">' + d.fullName + ' - ' + d.specialty + '</option>').join('') + '</select></div><div class="form-group"><label class="form-label">Xizmat</label><select id="pat-service" class="form-input">' + services.map(s => '<option value="' + s.id + '" data-price="' + s.price + '">' + s.name + ' - ' + s.price.toLocaleString() + ' so\'m</option>').join('') + '</select></div></div>', (modal) => {
       const fullName = modal.querySelector('#pat-fullname').value.trim();
       const phone = modal.querySelector('#pat-phone').value.trim();
       const birth = modal.querySelector('#pat-birth').value;
@@ -333,38 +382,26 @@
       if (!fullName || !phone) { toast('Iltimos, F.I.SH va telefonni kiriting', 'error'); return false; }
       const patient = addPatient({ fullName, phone, birthDate: birth, gender: 'male', address: '', passportOrPin: '', bloodGroup: '', allergies: [], chronicDiseases: [], balance: 0, totalVisits: 0, lastVisitDate: null });
       addToQueue(patient.id, doctorId, serviceName, price);
-      renderCurrentPage();
+      render();
     }, "Bemorni navbatga qo'shish");
   }
+  window.showAddPatientModal = showAddPatientModal;
 
   function showPaymentModal() {
-    showModal('Yangi to\'lov', `
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Bemor *</label><select id="pay-patient" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;">${State.patients.map(p => '<option value="' + p.id + '">' + p.fullName + ' - ' + p.phone + '</option>').join('')}</select></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Xizmat *</label><select id="pay-service" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;">${State.services.map(s => '<option value="' + s.id + '" data-price="' + s.price + '">' + s.name + ' - ' + s.price.toLocaleString() + " so'm</option>").join('')}</select></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">To'lov usuli</label><select id="pay-method" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"><option value="cash">Naqd</option><option value="card">Karta</option><option value="transfer">O'tkazma</option></select></div>
-      </div>
-    `, (modal) => {
+    showModal("Yangi to'lov", '<div style="display:flex;flex-direction:column;gap:12px;"><div class="form-group"><label class="form-label">Bemor *</label><select id="pay-patient" class="form-input">' + State.patients.map(p => '<option value="' + p.id + '">' + p.fullName + ' - ' + p.phone + '</option>').join('') + '</select></div><div class="form-group"><label class="form-label">Xizmat *</label><select id="pay-service" class="form-input">' + State.services.map(s => '<option value="' + s.id + '" data-price="' + s.price + '">' + s.name + ' - ' + s.price.toLocaleString() + ' so\'m</option>').join('') + '</select></div><div class="form-group"><label class="form-label">To\'lov usuli</label><select id="pay-method" class="form-input"><option value="cash">Naqd</option><option value="card">Karta</option><option value="transfer">O\'tkazma</option></select></div></div>', (modal) => {
       const pid = modal.querySelector('#pay-patient').value;
       const ss = modal.querySelector('#pay-service');
       const serviceName = ss.options[ss.selectedIndex].text.split(' - ')[0];
       const price = parseInt(ss.options[ss.selectedIndex].dataset.price);
       const method = modal.querySelector('#pay-method').value;
       addTransaction(pid, [{ name: serviceName, price, quantity: 1 }], method);
-      renderCurrentPage();
+      render();
     }, "To'lovni qabul qilish");
   }
+  window.showPaymentModal = showPaymentModal;
 
   function showAddStaffModal() {
-    showModal('Yangi xodim qo\'shish', `
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">F.I.SH *</label><input id="st-fullname" type="text" placeholder="Masalan: Dr. Akmal Karimov" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Lavozim *</label><select id="st-role" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"><option value="doctor">Shifokor</option><option value="reception">Registratura</option><option value="cashier">Kassir</option><option value="admin">Administrator</option><option value="lab_tech">Laborant</option><option value="pharmacist">Farmasevt</option></select></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Mutaxassislik</label><input id="st-specialty" type="text" placeholder="Masalan: Terapevt" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Telefon</label><input id="st-phone" type="tel" placeholder="+998 90 123-45-67" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"></div>
-        <div><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">PIN kod (4 raqam)</label><input id="st-pin" type="text" placeholder="1234" maxlength="4" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;box-sizing:border-box;"></div>
-      </div>
-    `, (modal) => {
+    showModal("Yangi xodim qo'shish", '<div style="display:flex;flex-direction:column;gap:12px;"><div class="form-group"><label class="form-label">F.I.SH *</label><input id="st-fullname" type="text" class="form-input" placeholder="Masalan: Dr. Akmal Karimov"></div><div class="form-group"><label class="form-label">Lavozim *</label><select id="st-role" class="form-input"><option value="doctor">Shifokor</option><option value="reception">Registratura</option><option value="cashier">Kassir</option><option value="admin">Administrator</option><option value="lab_tech">Laborant</option><option value="pharmacist">Farmasevt</option></select></div><div class="form-group"><label class="form-label">Mutaxassislik</label><input id="st-specialty" type="text" class="form-input" placeholder="Masalan: Terapevt"></div><div class="form-group"><label class="form-label">Telefon</label><input id="st-phone" type="tel" class="form-input" placeholder="+998 90 123-45-67"></div><div class="form-group"><label class="form-label">PIN kod (4 raqam)</label><input id="st-pin" type="text" class="form-input" placeholder="1234" maxlength="4"></div></div>', (modal) => {
       const fullName = modal.querySelector('#st-fullname').value.trim();
       const role = modal.querySelector('#st-role').value;
       const specialty = modal.querySelector('#st-specialty').value.trim();
@@ -372,148 +409,36 @@
       const pin = modal.querySelector('#st-pin').value.trim() || '1234';
       if (!fullName) { toast('Iltimos, F.I.SH ni kiriting', 'error'); return false; }
       addStaff({ fullName, role, specialty, phone, email: '', username: fullName.toLowerCase().replace(/\s+/g, '_'), password: pin, pinCode: pin, consultationFee: role === 'doctor' ? 100000 : 0, commissionPercent: role === 'doctor' ? 35 : 0, workSchedule: '08:00 - 18:00', roomNumber: '' });
-      renderCurrentPage();
+      render();
     }, "Xodimni qo'shish");
   }
+  window.showAddStaffModal = showAddStaffModal;
 
   function showPatientIntakeModal() {
     const myQueue = State.queue.filter(q => q.doctorId === State.currentUser?.id && q.status === 'waiting');
     const queueToShow = myQueue.length > 0 ? myQueue : State.queue.filter(q => q.status === 'waiting');
     if (queueToShow.length === 0) { toast('Hozircha navbat yo\'q', 'info'); return; }
-    showModal('Bemor qabul qilish - navbatdan tanlang', `
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${queueToShow.map((q, idx) => '<div style="padding:10px;border:1px solid #e2e8f0;border-radius:6px;cursor:pointer;" onclick="document.getElementById(\'selected-queue\').value=\'' + q.id + '\';document.querySelectorAll(\'.queue-item\').forEach(i=>i.style.background=\'white\');this.style.background=\'#dbeafe\';" class="queue-item"><div style="font-weight:600;color:#003c90;">' + q.ticketNumber + ' - ' + q.patientName + '</div><div style="font-size:12px;color:#64748b;">' + q.serviceName + ' • ' + q.price.toLocaleString() + " so'm</div></div>").join('')}
-        <input type="hidden" id="selected-queue" value="${queueToShow[0]?.id || ''}">
-        <div style="margin-top:12px;"><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Diagnoz</label><textarea id="intake-diagnosis" placeholder="Diagnozni kiriting" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;min-height:60px;box-sizing:border-box;"></textarea></div>
-        <div style="margin-top:8px;"><label style="display:block;margin-bottom:4px;font-weight:600;font-size:13px;">Retsept</label><textarea id="intake-prescription" placeholder="Retsept va davolash rejasini kiriting" style="width:100%;padding:10px 14px;border:1px solid #c3c6d5;border-radius:6px;font-size:14px;min-height:60px;box-sizing:border-box;"></textarea></div>
-      </div>
-    `, (modal) => {
-      const qid = modal.querySelector('#selected-queue').value;
+    showModal("Bemor qabul qilish", '<div style="display:flex;flex-direction:column;gap:12px;"><div class="form-group"><label class="form-label">Bemor tanlang</label><select id="intake-queue" class="form-input">' + queueToShow.map(q => '<option value="' + q.id + '">' + q.ticketNumber + ' - ' + q.patientName + '</option>').join('') + '</select></div><div class="form-group"><label class="form-label">Diagnoz</label><textarea id="intake-diagnosis" class="form-input" rows="3" placeholder="Diagnozni kiriting"></textarea></div><div class="form-group"><label class="form-label">Retsept va davolash rejasi</label><textarea id="intake-prescription" class="form-input" rows="3" placeholder="Retseptni kiriting"></textarea></div></div>', (modal) => {
+      const qid = modal.querySelector('#intake-queue').value;
       const diag = modal.querySelector('#intake-diagnosis').value.trim();
       const pres = modal.querySelector('#intake-prescription').value.trim();
-      if (!qid) { toast('Bemor tanlang', 'error'); return false; }
       const q = State.queue.find(x => x.id === qid);
-      if (q) { updateQueueStatus(qid, 'in_progress'); if (diag) saveConsultation(q.patientId, diag, pres, ''); toast(q.patientName + ' qabul qilinmoqda', 'success'); renderCurrentPage(); }
+      if (q) { updateQueueStatus(qid, 'in_progress'); if (diag) saveConsultation(q.patientId, diag, pres, ''); render(); }
     }, "Qabul qilishni boshlash");
   }
+  window.showPatientIntakeModal = showPatientIntakeModal;
 
-  function renderCurrentPage() {
-    const page = (window.location.pathname.split('/').pop() || 'index').replace('.html', '');
-    renderPageData(page);
-  }
-
-  function renderPageData(page) {
-    switch (page) {
-      case 'dashboard': renderDashboard(); break;
-      case 'reception': case 'reception-pro': renderReception(); break;
-      case 'patients': renderPatients(); break;
-      case 'doctor': case 'doctor-cabinet': renderDoctor(); break;
-      case 'cashier': renderCashier(); break;
-      case 'patient-history': renderPatientHistory(); break;
-      case 'analytics': renderAnalytics(); break;
-    }
-  }
-
-  function renderDashboard() {
-    const main = document.querySelector('main');
-    if (!main || document.getElementById('cf-dashboard-panel')) return;
-    const panel = document.createElement('div');
-    panel.id = 'cf-dashboard-panel';
-    panel.style.cssText = 'background:white;border-radius:8px;padding:16px;margin:16px;border:1px solid #e2e8f0;font-family:Inter,sans-serif;';
-    const totalRev = State.transactions.reduce((s, t) => s + t.totalAmount, 0);
-    const waitingCount = State.queue.filter(q => q.status === 'waiting').length;
-    panel.innerHTML = '<h3 style="margin:0 0 12px;color:#003c90;font-size:16px;font-weight:700;">Klinika holati</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;"><div style="padding:12px;background:#f0f9ff;border-radius:6px;"><div style="font-size:12px;color:#64748b;">Bemorlar</div><div style="font-size:20px;font-weight:700;color:#003c90;">' + State.patients.length + '</div></div><div style="padding:12px;background:#fef3c7;border-radius:6px;"><div style="font-size:12px;color:#64748b;">Navbat (kutilmoqda)</div><div style="font-size:20px;font-weight:700;color:#92400e;">' + waitingCount + '</div></div><div style="padding:12px;background:#f0fdf4;border-radius:6px;"><div style="font-size:12px;color:#64748b;">Tushum</div><div style="font-size:20px;font-weight:700;color:#006a6a;">' + totalRev.toLocaleString() + " so'm</div></div><div style=\"padding:12px;background:#fdf2f8;border-radius:6px;\"><div style=\"font-size:12px;color:#64748b;\">Xodimlar</div><div style=\"font-size:20px;font-weight:700;color:#9d174d;\">" + State.staffList.length + '</div></div></div>';
-    main.insertBefore(panel, main.firstChild);
-  }
-
-  function renderReception() {
-    const main = document.querySelector('main');
-    if (!main) return;
-    const existing = document.getElementById('cf-reception-queue');
-    if (existing) existing.remove();
-    const q = document.createElement('div');
-    q.id = 'cf-reception-queue';
-    q.style.cssText = 'background:white;border-radius:8px;padding:16px;margin:16px;border:1px solid #e2e8f0;font-family:Inter,sans-serif;';
-    const items = State.queue.length === 0
-      ? '<div style="text-align:center;padding:2rem;color:#64748b;">Hozircha navbat yo\'q. "Yangi bemor qo\'shish" tugmasini bosing.</div>'
-      : '<div style="display:flex;flex-direction:column;gap:6px;">' + State.queue.slice(0, 15).map(item => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#f9fafb;"><div style="display:flex;gap:12px;align-items:center;"><span style="background:#003c90;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:700;">' + item.ticketNumber + '</span><div><div style="font-weight:600;color:#191c1e;">' + item.patientName + '</div><div style="font-size:12px;color:#64748b;">' + item.doctorName + ' • ' + item.serviceName + '</div></div></div><div style="display:flex;gap:8px;align-items:center;"><span style="font-weight:600;color:#003c90;">' + item.price.toLocaleString() + " so'm</span><span class=\"status-" + (item.status === 'waiting' ? 'waiting' : item.status === 'in_progress' ? 'progress' : 'completed') + '">' + (item.status === 'waiting' ? 'Kutilmoqda' : item.status === 'in_progress' ? 'Qabulda' : 'Yakunlandi') + '</span></div></div>').join('') + '</div>';
-    q.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h3 style="margin:0;color:#003c90;font-size:16px;font-weight:700;">Bugungi navbat (' + State.queue.length + ')</h3><button id="cf-add-patient-btn" style="padding:8px 16px;background:#003c90;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">+ Yangi bemor</button></div>' + items;
-    main.insertBefore(q, main.firstChild);
-    const btn = q.querySelector('#cf-add-patient-btn');
-    if (btn) btn.addEventListener('click', () => showAddPatientModal());
-  }
-
-  function renderPatients() {
-    const main = document.querySelector('main');
-    if (!main) return;
-    const existing = document.getElementById('cf-patients-panel');
-    if (existing) existing.remove();
-    const p = document.createElement('div');
-    p.id = 'cf-patients-panel';
-    p.style.cssText = 'background:white;border-radius:8px;padding:16px;margin:16px;border:1px solid #e2e8f0;font-family:Inter,sans-serif;';
-    p.innerHTML = '<h3 style="margin:0 0 12px;color:#003c90;font-size:16px;font-weight:700;">Bemorlar ro\'yxati (' + State.patients.length + ')</h3>' + (State.patients.length === 0 ? '<div style="text-align:center;padding:2rem;color:#64748b;">Bemorlar yo\'q</div>' : '<div style="display:flex;flex-direction:column;gap:6px;">' + State.patients.map(pat => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#f9fafb;"><div style="display:flex;gap:12px;align-items:center;"><span style="background:#003c90;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:700;">' + pat.patientNumber + '</span><div><div style="font-weight:600;color:#191c1e;">' + pat.fullName + '</div><div style="font-size:12px;color:#64748b;">' + pat.phone + ' • ' + (pat.birthDate || '-') + '</div></div></div><div style="font-size:12px;color:#64748b;">Tashriflar: ' + (pat.totalVisits || 0) + '</div></div>').join('') + '</div>');
-    main.insertBefore(p, main.firstChild);
-  }
-
-  function renderDoctor() {
-    const main = document.querySelector('main');
-    if (!main) return;
-    const existing = document.getElementById('cf-doctor-queue');
-    if (existing) existing.remove();
-    const myQueue = State.currentUser?.role === 'doctor' ? State.queue.filter(q => q.doctorId === State.currentUser.id) : State.queue;
-    const queueToShow = myQueue.length > 0 ? myQueue : State.queue;
-    const q = document.createElement('div');
-    q.id = 'cf-doctor-queue';
-    q.style.cssText = 'background:white;border-radius:8px;padding:16px;margin:16px;border:1px solid #e2e8f0;font-family:Inter,sans-serif;';
-    const waitingCount = queueToShow.filter(q => q.status === 'waiting').length;
-    q.innerHTML = '<h3 style="margin:0 0 12px;color:#003c90;font-size:16px;font-weight:700;">' + (State.currentUser ? State.currentUser.fullName + ' - ' : '') + 'Bemorlar navbati (' + waitingCount + ' kutilmoqda)</h3>' + (queueToShow.length === 0 ? '<div style="text-align:center;padding:2rem;color:#64748b;">Hozircha navbat yo\'q</div>' : '<div style="display:flex;flex-direction:column;gap:6px;">' + queueToShow.slice(0, 15).map(item => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:' + (item.status === 'in_progress' ? '#dbeafe' : '#f9fafb') + ';"><div style="display:flex;gap:12px;align-items:center;"><span style="background:#003c90;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:700;">' + item.ticketNumber + '</span><div><div style="font-weight:600;color:#191c1e;">' + item.patientName + '</div><div style="font-size:12px;color:#64748b;">' + item.doctorName + ' • ' + item.serviceName + ' • ' + item.price.toLocaleString() + " so'm</div></div></div><div style=\"display:flex;gap:8px;align-items:center;\"><span class=\"status-" + (item.status === 'waiting' ? 'waiting' : item.status === 'in_progress' ? 'progress' : 'completed') + '">' + (item.status === 'waiting' ? 'Kutilmoqda' : item.status === 'in_progress' ? 'Qabulda' : 'Yakunlandi') + '</span>' + (item.status === 'waiting' ? '<button onclick="ClinicFlow.updateQueueStatus(\'' + item.id + '\',\'in_progress\')" style="padding:6px 12px;background:#003c90;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">Qabul qilish</button>' : item.status === 'in_progress' ? '<button onclick="ClinicFlow.updateQueueStatus(\'' + item.id + '\',\'completed\')" style="padding:6px 12px;background:#006a6a;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">Yakunlash</button>' : '') + '</div></div>').join('') + '</div>');
-    main.insertBefore(q, main.firstChild);
-  }
-
-  function renderCashier() {
-    const main = document.querySelector('main');
-    if (!main) return;
-    const existing = document.getElementById('cf-cashier-panel');
-    if (existing) existing.remove();
-    const totalRev = State.transactions.reduce((s, t) => s + t.totalAmount, 0);
-    const p = document.createElement('div');
-    p.id = 'cf-cashier-panel';
-    p.style.cssText = 'background:white;border-radius:8px;padding:16px;margin:16px;border:1px solid #e2e8f0;font-family:Inter,sans-serif;';
-    p.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="margin:0;color:#003c90;font-size:16px;font-weight:700;">Kassa hisoboti</h3><button id="cf-new-payment" style="padding:8px 16px;background:#003c90;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">+ Yangi to\'lov</button></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;"><div style="padding:12px;background:#f0f9ff;border-radius:6px;"><div style="font-size:12px;color:#64748b;">Bugungi tushum</div><div style="font-size:18px;font-weight:700;color:#003c90;">' + totalRev.toLocaleString() + " so'm</div></div><div style=\"padding:12px;background:#f0fdf4;border-radius:6px;\"><div style=\"font-size:12px;color:#64748b;\">To'lovlar soni</div><div style=\"font-size:18px;font-weight:700;color:#006a6a;\">" + State.transactions.length + ' ta</div></div></div><h4 style="margin:16px 0 8px;color:#003c90;font-size:14px;">So\'nggi to\'lovlar</h4>' + (State.transactions.length === 0 ? '<div style="text-align:center;padding:1.5rem;color:#64748b;">Hozircha to\'lovlar yo\'q</div>' : '<div style="display:flex;flex-direction:column;gap:6px;">' + State.transactions.slice().reverse().slice(0, 10).map(t => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#f9fafb;"><div style="display:flex;gap:12px;align-items:center;"><span style="background:#003c90;color:white;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:700;">' + t.receiptNumber + '</span><div><div style="font-weight:600;color:#191c1e;">' + t.patientName + '</div><div style="font-size:12px;color:#64748b;">' + t.items.length + ' ta xizmat • ' + (t.paymentMethod === 'cash' ? 'Naqd' : t.paymentMethod === 'card' ? 'Karta' : 'O\'tkazma') + '</div></div></div><div style="font-weight:600;color:#003c90;">' + t.totalAmount.toLocaleString() + " so'm</div></div>").join('') + '</div>');
-    main.insertBefore(p, main.firstChild);
-    const btn = p.querySelector('#cf-new-payment');
-    if (btn) btn.addEventListener('click', () => showPaymentModal());
-  }
-
-  function renderPatientHistory() {
-    const main = document.querySelector('main');
-    if (!main) return;
-    const existing = document.getElementById('cf-consultations');
-    if (existing) existing.remove();
-    const d = document.createElement('div');
-    d.id = 'cf-consultations';
-    d.style.cssText = 'background:white;border-radius:8px;padding:16px;margin:16px;border:1px solid #e2e8f0;font-family:Inter,sans-serif;';
-    d.innerHTML = '<h3 style="margin:0 0 12px;color:#003c90;font-size:16px;font-weight:700;">So\'nggi konsultatsiyalar (' + State.consultations.length + ')</h3>' + (State.consultations.length === 0 ? '<div style="text-align:center;padding:2rem;color:#64748b;">Konsultatsiyalar yo\'q</div>' : State.consultations.slice().reverse().slice(0, 10).map(c => '<div style="padding:10px;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><strong style="color:#003c90;">' + c.patientName + '</strong><span style="font-size:12px;color:#64748b;">' + new Date(c.date).toLocaleDateString('uz-UZ') + '</span></div><div style="font-size:13px;margin-bottom:4px;"><strong>Shifokor:</strong> ' + c.doctorName + '</div><div style="font-size:13px;margin-bottom:4px;"><strong>Diagnoz:</strong> ' + c.diagnosis + '</div>' + (c.prescription ? '<div style="font-size:13px;"><strong>Retsept:</strong> ' + c.prescription + '</div>' : '') + '</div>').join(''));
-    main.insertBefore(d, main.firstChild);
-  }
-
-  function renderAnalytics() {
-    const main = document.querySelector('main');
-    if (!main) return;
-    const existing = document.getElementById('cf-analytics-panel');
-    if (existing) existing.remove();
-    const totalRev = State.transactions.reduce((s, t) => s + t.totalAmount, 0);
-    const p = document.createElement('div');
-    p.id = 'cf-analytics-panel';
-    p.style.cssText = 'background:white;border-radius:8px;padding:16px;margin:16px;border:1px solid #e2e8f0;font-family:Inter,sans-serif;';
-    p.innerHTML = '<h3 style="margin:0 0 12px;color:#003c90;font-size:16px;font-weight:700;">Tahlil va hisobot</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;"><div style="padding:12px;background:#f0f9ff;border-radius:6px;"><div style="font-size:12px;color:#64748b;">Jami tushum</div><div style="font-size:18px;font-weight:700;color:#003c90;">' + totalRev.toLocaleString() + " so'm</div></div><div style=\"padding:12px;background:#f0fdf4;border-radius:6px;\"><div style=\"font-size:12px;color:#64748b;\">Bemorlar</div><div style=\"font-size:18px;font-weight:700;color:#006a6a;\">" + State.patients.length + '</div></div><div style="padding:12px;background:#fef3c7;border-radius:6px;"><div style="font-size:12px;color:#64748b;">Konsultatsiyalar</div><div style="font-size:18px;font-weight:700;color:#92400e;">' + State.consultations.length + '</div></div></div>';
-    main.insertBefore(p, main.firstChild);
+  // === Init ===
+  function init() {
+    initState();
+    render();
+    const loader = document.getElementById('loader');
+    if (loader) { loader.classList.add('hidden'); setTimeout(() => loader.remove(), 300); }
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupPage);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    setupPage();
+    init();
   }
-  window.addEventListener('load', () => { setTimeout(hideLoader, 100); });
 })();
