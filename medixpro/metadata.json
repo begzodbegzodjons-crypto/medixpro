@@ -1,6 +1,0 @@
-{
-  "name": "MedixPro - Professional Klinika SaaS ERP CRM",
-  "description": "Avtomatlashtirilgan ko'p tarmoqli klinika boshqaruv tizimi: Registratura, navbat va Xprinter termal chek chop etish, shifokorlar kabineti, palatalar sxemasi, kassa-moliya, laboratoriya, dorixona va hisobotlar.",
-  "requestFramePermissions": ["camera", "microphone"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClinicFlow ERP - Boshqaruv paneli</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#191c1e",
+                      "inverse-primary": "#b0c6ff",
+                      "outline-variant": "#c3c6d5",
+                      "secondary-fixed-dim": "#76d6d5",
+                      "tertiary-fixed": "#d3e4fe",
+                      "surface": "#f7f9fb",
+                      "on-secondary-fixed": "#002020",
+                      "primary-container": "#0f52ba",
+                      "on-primary-fixed-variant": "#00419c",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container-high": "#e6e8ea",
+                      "surface-variant": "#e0e3e5",
+                      "surface-dim": "#d8dadc",
+                      "on-surface-variant": "#434653",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-container": "#bfd0ea",
+                      "tertiary": "#324257",
+                      "surface-container": "#eceef0",
+                      "on-primary-container": "#bcceff",
+                      "primary-fixed": "#d9e2ff",
+                      "inverse-on-surface": "#eff1f3",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-surface": "#2d3133",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "secondary-fixed": "#93f2f2",
+                      "on-secondary-fixed-variant": "#004f4f",
+                      "error-container": "#ffdad6",
+                      "surface-tint": "#1d59c1",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "on-surface": "#191c1e",
+                      "background": "#f7f9fb",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-primary-fixed": "#001945",
+                      "on-primary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "secondary": "#006a6a",
+                      "secondary-container": "#90efef",
+                      "on-secondary-container": "#006e6e",
+                      "primary": "#003c90",
+                      "outline": "#737784",
+                      "on-error": "#ffffff",
+                      "error": "#ba1a1a",
+                      "tertiary-container": "#49596f"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1440px",
+                      "md": "16px",
+                      "gutter": "20px",
+                      "xs": "4px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "xl": "32px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-bold": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "data-mono": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "body-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="/assets/app.css?v=20260821">
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex h-screen overflow-hidden"><div id="cf-loader"><div><div class="spinner"></div><div class="text">ClinicFlow ERP yuklanmoqda...</div></div></div>
+<!-- SideNavBar (JSON Component) -->
+<aside class="hidden md:flex flex-col h-full w-[240px] py-md border-r border-outline-variant bg-surface dark:bg-on-background fixed left-0 flex-shrink-0 z-40 shadow-sm">
+<div class="px-md pb-lg border-b border-outline-variant mb-4">
+<div class="flex items-center gap-3 cursor-pointer hover:bg-surface-container rounded-lg p-2 transition-all group">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-headline-sm">
+                    MC
+                </div>
+<div class="flex-1 min-w-0">
+<h2 class="text-body-lg font-bold text-on-surface truncate">Main City Clinic</h2>
+<p class="text-body-sm text-on-surface-variant flex items-center gap-1">Switch Clinic <span class="material-symbols-outlined text-[16px] group-hover:translate-y-[2px] transition-transform">keyboard_arrow_down</span></p>
+</div>
+</div>
+<button class="mt-4 w-full bg-primary text-on-primary hover:bg-on-primary-fixed-variant transition-colors py-2 px-4 rounded-lg text-label-bold font-label-bold flex items-center justify-center gap-2 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)]">
+<span class="material-symbols-outlined text-[18px]">add</span> New Appointment
+            </button>
+</div>
+<nav class="flex-1 overflow-y-auto px-sm space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary dark:text-inverse-primary font-bold bg-primary-container/10 dark:bg-primary-container/20 scale-95 transition-transform duration-150" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-body-md font-body-md">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/patients">
+<span class="material-symbols-outlined">group</span>
+<span class="text-body-md font-body-md">Queue</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/patient-history">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-body-md font-body-md">Medical Records</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/cashier">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-body-md font-body-md">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/invoice">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-body-md font-body-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/settings">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-body-md font-body-md">Clinic Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-sm pt-4 border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/analytics">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-body-md font-body-md">System Status</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-body-md font-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-[240px] w-full min-w-0 bg-surface-container-lowest">
+<!-- TopNavBar (JSON Component) -->
+<header class="flex justify-between items-center w-full px-md h-16 sticky top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-on-surface-variant">
+<div class="flex items-center gap-lg">
+<!-- Mobile Menu Button -->
+<button class="md:hidden text-on-surface-variant p-2 hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary dark:text-inverse-primary hidden sm:block">ClinicFlow ERP</h1>
+<!-- Search Bar -->
+<div class="relative hidden lg:block w-64 xl:w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+<input class="w-full h-10 pl-10 pr-4 rounded-lg bg-surface-container-low border border-outline-variant text-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-container/20 transition-all placeholder:text-outline" placeholder="Search patients, IDs..." type="text"/>
+</div>
+</div>
+<!-- Navigation Links (Hidden on Mobile) -->
+<nav class="hidden md:flex items-center h-full">
+<a class="h-full flex items-center px-4 text-primary dark:text-inverse-primary border-b-2 border-primary dark:border-inverse-primary pb-1 text-label-bold font-label-bold opacity-80 transition-opacity" href="/dashboard">Dashboard</a>
+<a class="h-full flex items-center px-4 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors text-label-bold font-label-bold" href="/patients">Patients</a>
+<a class="h-full flex items-center px-4 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors text-label-bold font-label-bold" href="/reception">Schedule</a>
+<a class="h-full flex items-center px-4 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors text-label-bold font-label-bold" href="/analytics">Reports</a>
+</nav>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors hidden sm:block">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-tertiary-container overflow-hidden ml-2 cursor-pointer border border-outline-variant">
+<img alt="Dr. Smith's Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a mature female doctor with glasses, smiling warmly, wearing a white coat over a light blue shirt. Bright, clean, clinical lighting, high quality portrait photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZJoLk2cjMjHya1l1v5aeFnnoanaQ481z4uIGWo4fLfvawYWlbU-4o9KrvWOw2WJZ4PcDPg6oVyg2S1wYYMt1vMbPqlUGfpo5RaoK6NqqdILcNnDRa9Wix4j6h5PpfUbnREPO6vAKFejeu3qgube9BkHrkvBu-mDK02-iedLbQVmR4s2fzTMVwUYW_6-XO88RXaaEjIEp99A5F1_c7gsRZXgaWoAjLRwEhor7ycw1ZqmwPggAHfFwr"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<div class="flex-1 overflow-y-auto p-md md:p-lg bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto space-y-lg pb-xl">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+<div>
+<h2 class="text-display-lg font-display-lg text-on-surface">Network Overview</h2>
+<p class="text-body-md text-on-surface-variant mt-1">Real-time performance metrics across all active facilities.</p>
+</div>
+<div class="flex items-center gap-3 text-body-sm text-outline">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary-container inline-block"></span> Live Data</span>
+<span class="text-outline-variant">|</span>
+<span>Last updated: Just now</span>
+</div>
+</div>
+<!-- Bento Grid Key Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
+<!-- Metric Card 1 -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col justify-between hover:border-primary-fixed transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">accessible</span>
+</div>
+<span class="text-label-bold font-label-bold text-secondary flex items-center bg-secondary-container/20 px-2 py-1 rounded-full"><span class="material-symbols-outlined text-[14px] mr-1">trending_up</span> +12%</span>
+</div>
+<div>
+<p class="text-body-sm text-on-surface-variant font-label-bold">Total Patients</p>
+<p class="text-display-lg font-display-lg text-on-surface mt-1">14,208</p>
+</div>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col justify-between hover:border-primary-fixed transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-tertiary-container/10 rounded-lg text-tertiary-container">
+<span class="material-symbols-outlined">event_available</span>
+</div>
+<span class="text-label-bold font-label-bold text-outline flex items-center px-2 py-1"><span class="material-symbols-outlined text-[14px] mr-1">horizontal_rule</span> 0%</span>
+</div>
+<div>
+<p class="text-body-sm text-on-surface-variant font-label-bold">Active Appointments (Today)</p>
+<p class="text-display-lg font-display-lg text-on-surface mt-1">482</p>
+</div>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex flex-col justify-between hover:border-primary-fixed transition-colors">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-secondary-fixed/20 rounded-lg text-on-secondary-fixed-variant">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<span class="text-label-bold font-label-bold text-secondary flex items-center bg-secondary-container/20 px-2 py-1 rounded-full"><span class="material-symbols-outlined text-[14px] mr-1">trending_up</span> +4.5%</span>
+</div>
+<div>
+<p class="text-body-sm text-on-surface-variant font-label-bold">Est. Revenue (MTD)</p>
+<p class="text-display-lg font-display-lg text-on-surface mt-1">$1.2M</p>
+</div>
+</div>
+<!-- Metric Card 4: System Status -->
+<div class="bg-primary border border-primary-container rounded-xl p-md flex flex-col justify-between text-on-primary relative overflow-hidden shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)]">
+<!-- Abstract Background Pattern -->
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+<div class="relative z-10 flex justify-between items-start mb-4">
+<div class="p-2 bg-white/20 rounded-lg text-white">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<span class="flex items-center gap-1 text-label-bold font-label-bold"><span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span> All Systems Operational</span>
+</div>
+<div class="relative z-10">
+<p class="text-body-sm font-label-bold text-primary-fixed-dim">Uptime</p>
+<p class="text-display-lg font-display-lg mt-1">99.98%</p>
+</div>
+</div>
+</div>
+<!-- Secondary Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md">
+<!-- Chart Area (Placeholder) -->
+<div class="lg:col-span-2 bg-white border border-outline-variant rounded-xl p-md shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Patient Intake Volume</h3>
+<select class="text-body-sm border border-outline-variant rounded-md py-1 px-2 bg-surface-container-low text-on-surface-variant focus:border-primary focus:ring-0">
+<option>Last 7 Days</option>
+<option>Last 30 Days</option>
+<option>Year to Date</option>
+</select>
+</div>
+<!-- Stylized Chart Placeholder -->
+<div class="flex-1 min-h-[250px] relative border-b border-l border-outline-variant/50 pt-4 pr-2 pb-6 pl-8">
+<!-- Y Axis Labels -->
+<div class="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] text-outline font-data-mono">
+<span>500</span><span>400</span><span>300</span><span>200</span><span>100</span><span>0</span>
+</div>
+<!-- Grid Lines -->
+<div class="absolute left-8 right-2 top-4 bottom-6 flex flex-col justify-between">
+<div class="w-full border-t border-outline-variant/20"></div>
+<div class="w-full border-t border-outline-variant/20"></div>
+<div class="w-full border-t border-outline-variant/20"></div>
+<div class="w-full border-t border-outline-variant/20"></div>
+<div class="w-full border-t border-outline-variant/20"></div>
+</div>
+<!-- Bars -->
+<div class="absolute left-10 right-4 bottom-6 top-4 flex justify-between items-end gap-2">
+<div class="w-full bg-primary-fixed-dim rounded-t-sm h-[40%] hover:bg-primary transition-colors relative group"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-primary text-[10px] py-1 px-2 rounded hidden group-hover:block whitespace-nowrap">Mon: 200</div></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm h-[60%] hover:bg-primary transition-colors relative group"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-primary text-[10px] py-1 px-2 rounded hidden group-hover:block whitespace-nowrap">Tue: 300</div></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm h-[55%] hover:bg-primary transition-colors relative group"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-primary text-[10px] py-1 px-2 rounded hidden group-hover:block whitespace-nowrap">Wed: 275</div></div>
+<div class="w-full bg-primary rounded-t-sm h-[80%] shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] relative group"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-primary text-[10px] py-1 px-2 rounded hidden group-hover:block whitespace-nowrap">Thu: 400</div></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm h-[45%] hover:bg-primary transition-colors relative group"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-primary text-[10px] py-1 px-2 rounded hidden group-hover:block whitespace-nowrap">Fri: 225</div></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm h-[20%] hover:bg-primary transition-colors relative group"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-primary text-[10px] py-1 px-2 rounded hidden group-hover:block whitespace-nowrap">Sat: 100</div></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm h-[15%] hover:bg-primary transition-colors relative group"><div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-inverse-surface text-on-primary text-[10px] py-1 px-2 rounded hidden group-hover:block whitespace-nowrap">Sun: 75</div></div>
+</div>
+<!-- X Axis Labels -->
+<div class="absolute left-10 right-4 -bottom-6 flex justify-between text-[10px] text-outline font-data-mono">
+<span class="w-full text-center">Mon</span><span class="w-full text-center">Tue</span><span class="w-full text-center">Wed</span><span class="w-full text-center font-bold text-on-surface">Thu</span><span class="w-full text-center">Fri</span><span class="w-full text-center">Sat</span><span class="w-full text-center">Sun</span>
+</div>
+</div>
+</div>
+<!-- Clinic Performance List -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-sm flex flex-col overflow-hidden">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Top Clinics</h3>
+<button class="text-primary text-body-sm font-label-bold hover:underline">View All</button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- List Item -->
+<div class="p-3 border-b border-outline-variant/50 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container/10 flex items-center justify-center text-primary font-label-bold text-[10px]">MC</div>
+<div>
+<p class="text-body-md font-label-bold text-on-surface">Main City Clinic</p>
+<p class="text-body-sm text-on-surface-variant text-[11px]">98% Efficiency</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-md font-data-mono text-on-surface">420 pts</p>
+</div>
+</div>
+<!-- List Item -->
+<div class="p-3 border-b border-outline-variant/50 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-tertiary-container/10 flex items-center justify-center text-tertiary-container font-label-bold text-[10px]">NW</div>
+<div>
+<p class="text-body-md font-label-bold text-on-surface">Northwood Branch</p>
+<p class="text-body-sm text-on-surface-variant text-[11px]">94% Efficiency</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-md font-data-mono text-on-surface">315 pts</p>
+</div>
+</div>
+<!-- List Item -->
+<div class="p-3 border-b border-outline-variant/50 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-error-container/20 flex items-center justify-center text-error font-label-bold text-[10px]">ST</div>
+<div>
+<p class="text-body-md font-label-bold text-on-surface">South Terminal</p>
+<p class="text-body-sm text-error text-[11px]">81% Efficiency (Low)</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-md font-data-mono text-on-surface">190 pts</p>
+</div>
+</div>
+<!-- List Item -->
+<div class="p-3 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-secondary-container/20 flex items-center justify-center text-on-secondary-container font-label-bold text-[10px]">EP</div>
+<div>
+<p class="text-body-md font-label-bold text-on-surface">East Park Center</p>
+<p class="text-body-sm text-on-surface-variant text-[11px]">91% Efficiency</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-md font-data-mono text-on-surface">145 pts</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+    <script src="/assets/app.js?v=20260821"></script>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var loader = document.getElementById('cf-loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(function() { loader.remove(); }, 350);
+                }
+            }, 200);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,109 @@
+/* ClinicFlow ERP - Common styles */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #f7f9fb !important;
+    color: #191c1e !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Loader overlay - prevents flicker */
+#cf-loader {
+    position: fixed;
+    inset: 0;
+    background: #f7f9fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    transition: opacity 0.3s ease;
+}
+#cf-loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+#cf-loader .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e0e3e5;
+    border-top: 3px solid #003c90;
+    border-radius: 50%;
+    animation: cf-spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+}
+#cf-loader .text {
+    color: #003c90;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+}
+@keyframes cf-spin { to { transform: rotate(360deg); } }
+
+/* Smooth transitions */
+a, button { transition: all 0.15s ease !important; }
+html { scroll-behavior: smooth; }
+
+/* Back-to-dashboard button */
+#back-to-dashboard {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    z-index: 9999;
+}
+#back-to-dashboard a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #003c90;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 12px rgba(0,60,144,0.3);
+    transition: all 0.2s ease;
+}
+#back-to-dashboard a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,60,144,0.4);
+}
+
+/* User info badge */
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #003c90;
+    color: white;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Print styles */
+@media print {
+    #back-to-dashboard, .cf-no-print, #cf-loader { display: none !important; }
+}
+
+/* Material Symbols icons */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    min-width: 24px;
+    text-align: center;
+}
+
+/* Toast slide-in animation */
+@keyframes cf-slide-in {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Status badges */
+.status-waiting { background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.status-progress { background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.status-completed { background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }

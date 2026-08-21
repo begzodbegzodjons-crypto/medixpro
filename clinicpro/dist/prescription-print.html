@@ -1,0 +1,267 @@
+<!DOCTYPE html><html lang="uz"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ClinicFlow ERP - Retseptni chop etish</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#191c1e",
+                        "on-primary-container": "#bcceff",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "surface-container-low": "#f2f4f6",
+                        "outline-variant": "#c3c6d5",
+                        "outline": "#737784",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary-fixed-variant": "#004f4f",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eceef0",
+                        "inverse-surface": "#2d3133",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "secondary": "#006a6a",
+                        "inverse-primary": "#b0c6ff",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#90efef",
+                        "on-secondary-container": "#006e6e",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#003c90",
+                        "secondary-fixed": "#93f2f2",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "tertiary": "#324257",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001945",
+                        "on-tertiary-container": "#bfd0ea",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "background": "#f7f9fb",
+                        "primary-container": "#0f52ba",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#1d59c1",
+                        "tertiary-container": "#49596f",
+                        "surface-bright": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed-dim": "#76d6d5",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#191c1e",
+                        "on-surface-variant": "#434653",
+                        "on-secondary-fixed": "#002020",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed-variant": "#00419c",
+                        "primary-fixed": "#d9e2ff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "xs": "4px",
+                        "container-max": "1440px",
+                        "sm": "8px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "label-bold": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "label-bold": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .no-print {
+                display: none;
+            }
+            .print-area {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="/assets/app.css?v=20260821">
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col items-center justify-center p-md sm:p-lg"><div id="cf-loader"><div><div class="spinner"></div><div class="text">ClinicFlow ERP yuklanmoqda...</div></div></div>
+<!-- Action Bar (No Print) -->
+<div class="no-print w-full max-w-[800px] flex justify-end mb-lg gap-sm"><button class="bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold px-lg py-sm rounded-lg flex items-center gap-sm shadow-sm hover:bg-surface-container-high transition-colors" style="opacity: 0;">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">picture_as_pdf</span>
+            PDF yuklab olish
+        </button>
+<button class="bg-primary text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-lg flex items-center gap-sm shadow-sm hover:bg-primary/90 transition-colors" onclick="window.print()">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">print</span>
+            Chop etish
+        </button>
+</div>
+<!-- Printable Area (A4/A5 proportions approximation) -->
+<div class="print-area bg-surface-container-lowest w-full max-w-[800px] min-h-[1131px] mx-auto shadow-md rounded-lg p-xl flex flex-col border border-outline-variant">
+<!-- Header -->
+<header class="flex justify-between items-start border-b-2 border-primary pb-md mb-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[40px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary m-0">MediFlow ERP</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant m-0">Markaziy Klinika</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-body-sm text-body-sm text-on-surface-variant m-0">Toshkent sh., Yunusobod tumani, 14-mavze</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant m-0">+998 (71) 123-45-67 | info@mediflow.uz</p>
+</div>
+</header>
+<!-- Title -->
+<div class="text-center mb-xl">
+<h2 class="font-display-lg text-display-lg text-on-surface uppercase tracking-widest">RETSEPT</h2>
+</div>
+<!-- Meta Info Grid -->
+<div class="grid grid-cols-2 gap-xl mb-xl">
+<!-- Patient Info -->
+<div class="bg-surface-container-low p-md rounded-DEFAULT border border-outline-variant">
+<h3 class="font-label-bold text-label-bold text-primary mb-sm uppercase tracking-wider border-b border-outline-variant pb-xs">Bemor Ma'lumotlari</h3>
+<div class="grid grid-cols-[auto_1fr] gap-x-md gap-y-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">F.I.Sh:</span>
+<span class="font-data-mono text-data-mono text-on-surface">Alisher Rustamov</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">ID raqami:</span>
+<span class="font-data-mono text-data-mono text-on-surface">#PT-8492</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tug'ilgan sana:</span>
+<span class="font-data-mono text-data-mono text-on-surface">12.05.1985</span>
+</div>
+</div>
+<!-- Doctor Info -->
+<div class="bg-surface-container-low p-md rounded-DEFAULT border border-outline-variant">
+<h3 class="font-label-bold text-label-bold text-primary mb-sm uppercase tracking-wider border-b border-outline-variant pb-xs">Shifokor Ma'lumotlari</h3>
+<div class="grid grid-cols-[auto_1fr] gap-x-md gap-y-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">F.I.Sh:</span>
+<span class="font-data-mono text-data-mono text-on-surface">Dr. Alisher Vohidov</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Mutaxassislik:</span>
+<span class="font-data-mono text-data-mono text-on-surface">Terapevt</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Sana:</span>
+<span class="font-data-mono text-data-mono text-on-surface">14.11.2023</span>
+</div>
+</div>
+</div>
+<!-- Diagnosis -->
+<div class="mb-lg">
+<h3 class="font-label-bold text-label-bold text-on-surface-variant mb-xs uppercase tracking-wider">Tashxis:</h3>
+<p class="font-headline-sm text-headline-sm text-on-surface border-l-4 border-primary pl-md py-xs bg-surface-container-low">O'tkir respirator virusli infeksiya (O'RVI)</p>
+</div>
+<!-- Prescriptions -->
+<div class="flex-grow">
+<h3 class="font-label-bold text-label-bold text-on-surface-variant mb-md uppercase tracking-wider border-b border-outline-variant pb-xs flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">prescriptions</span>
+                Dori vositalari
+            </h3>
+<div class="flex flex-col gap-md">
+<!-- Med 1 -->
+<div class="flex items-start gap-md pb-md border-b border-outline-variant border-dashed last:border-none">
+<div class="font-headline-md text-headline-md text-primary w-8 pt-1">1.</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-xs">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Amoksitsillin - 500mg</h4>
+<span class="font-label-bold text-label-bold text-on-surface-variant bg-surface-container px-sm py-xs rounded-full">1 tabletka</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-xs">Kuniga 2 mahal, ovqatdan so'ng</p>
+<p class="font-body-sm text-body-sm text-tertiary flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">schedule</span>
+                            7 kun davomida
+                        </p>
+</div>
+</div>
+<!-- Med 2 -->
+<div class="flex items-start gap-md pb-md border-b border-outline-variant border-dashed last:border-none">
+<div class="font-headline-md text-headline-md text-primary w-8 pt-1">2.</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-xs">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Paratsetamol - 500mg</h4>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-xs">Zarurat bo'lganda (Harorat 38.5 dan oshsa)</p>
+<p class="font-body-sm text-body-sm text-error flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">warning</span>
+                            Faqat isitma ko'tarilganda
+                        </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-xl pt-lg border-t-2 border-outline-variant flex justify-between items-end">
+<div class="flex flex-col items-center gap-xs">
+<!-- Placeholder for QR Code, using a simple styled div to represent it since we avoid external images -->
+<div class="w-24 h-24 bg-surface-container-highest border border-outline flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-outline text-[48px]" style="font-variation-settings: 'FILL' 0;">qr_code_2</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant text-center w-24 leading-tight">Haqiqiyligini tekshirish</span>
+</div>
+<div class="flex gap-xl">
+<div class="text-center w-40">
+<div class="w-full border-b border-outline-variant mb-xs h-12 flex items-end justify-center">
+<!-- Space for stamp -->
+<span class="font-label-bold text-label-bold text-outline opacity-50 uppercase">M.O'</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Muassasa muhri</span>
+</div>
+<div class="text-center w-48">
+<div class="w-full border-b border-outline-variant mb-xs h-12 flex items-end justify-center">
+<!-- Space for signature -->
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Shifokor imzosi</span>
+</div>
+</div>
+</footer>
+</div>
+
+
+    <script src="/assets/app.js?v=20260821"></script>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var loader = document.getElementById('cf-loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(function() { loader.remove(); }, 350);
+                }
+            }, 200);
+        });
+    </script>
+</body></html>

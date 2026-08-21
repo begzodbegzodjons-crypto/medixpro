@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClinicFlow ERP - Qabulxona va ro'yxatdan o'tish</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#191c1e",
+                      "inverse-primary": "#b0c6ff",
+                      "outline-variant": "#c3c6d5",
+                      "secondary-fixed-dim": "#76d6d5",
+                      "tertiary-fixed": "#d3e4fe",
+                      "surface": "#f7f9fb",
+                      "on-secondary-fixed": "#002020",
+                      "primary-container": "#0f52ba",
+                      "on-primary-fixed-variant": "#00419c",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-container-high": "#e6e8ea",
+                      "surface-variant": "#e0e3e5",
+                      "surface-dim": "#d8dadc",
+                      "on-surface-variant": "#434653",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-container": "#bfd0ea",
+                      "tertiary": "#324257",
+                      "surface-container": "#eceef0",
+                      "on-primary-container": "#bcceff",
+                      "primary-fixed": "#d9e2ff",
+                      "inverse-on-surface": "#eff1f3",
+                      "surface-bright": "#f7f9fb",
+                      "inverse-surface": "#2d3133",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "secondary-fixed": "#93f2f2",
+                      "on-secondary-fixed-variant": "#004f4f",
+                      "error-container": "#ffdad6",
+                      "surface-tint": "#1d59c1",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "on-surface": "#191c1e",
+                      "background": "#f7f9fb",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-primary-fixed": "#001945",
+                      "on-primary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "secondary": "#006a6a",
+                      "secondary-container": "#90efef",
+                      "on-secondary-container": "#006e6e",
+                      "primary": "#003c90",
+                      "outline": "#737784",
+                      "on-error": "#ffffff",
+                      "error": "#ba1a1a",
+                      "tertiary-container": "#49596f"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1440px",
+                      "md": "16px",
+                      "gutter": "20px",
+                      "xs": "4px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "xl": "32px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-bold": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "data-mono": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "body-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="/assets/app.css?v=20260821">
+</head>
+<body class="bg-background text-on-surface min-h-screen flex"><div id="cf-loader"><div><div class="spinner"></div><div class="text">ClinicFlow ERP yuklanmoqda...</div></div></div>
+<!-- SideNavBar -->
+<nav aria-label="Sidebar" class="hidden md:flex flex-col h-screen w-[240px] py-md border-r border-outline-variant bg-surface dark:bg-on-background fixed left-0 top-0 z-40">
+<!-- Header -->
+<div class="px-md mb-xl flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">local_hospital</span>
+</div>
+<div>
+<h2 class="text-body-lg font-bold text-on-surface truncate">Main City Clinic</h2>
+<p class="text-label-bold font-label-bold text-on-surface-variant truncate">Switch Clinic</p>
+</div>
+</div>
+<!-- CTA -->
+<div class="px-md mb-lg">
+<button class="w-full bg-primary text-on-primary py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="text-body-md font-body-md font-medium">New Appointment</span>
+</button>
+</div>
+<!-- Main Nav -->
+<div class="flex-1 overflow-y-auto px-sm space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-body-md font-body-md">Overview</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary dark:text-inverse-primary font-bold bg-primary-container/10 dark:bg-primary-container/20 scale-95 transition-transform duration-150" href="/patients">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="text-body-md font-body-md">Queue</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/patient-history">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-body-md font-body-md">Medical Records</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/cashier">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-body-md font-body-md">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/invoice">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-body-md font-body-md">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/settings">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-body-md font-body-md">Clinic Settings</span>
+</a>
+</div>
+<!-- Footer Nav -->
+<div class="mt-auto px-sm pt-4 border-t border-outline-variant/50 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/analytics">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-body-md font-body-md">System Status</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-variant transition-all" href="/">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-body-md font-body-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[240px] flex flex-col min-h-screen bg-surface-container-low">
+<!-- TopAppBar (Mobile & Top Nav Context) -->
+<header class="flex justify-between items-center w-full px-md h-16 sticky top-0 z-50 bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-on-surface-variant">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Toggle (Visible only on mobile) -->
+<button class="md:hidden p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary dark:text-inverse-primary">ClinicFlow ERP</h1>
+</div>
+<!-- Top Nav Links (Hidden on mobile, showing context) -->
+<div class="hidden md:flex h-full items-end gap-6 px-4">
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors px-2" href="/dashboard">
+<span class="text-label-bold font-label-bold">Dashboard</span>
+</a>
+<a class="h-full flex items-center text-primary dark:text-inverse-primary border-b-2 border-primary dark:border-inverse-primary pb-1 opacity-80 transition-opacity px-2" href="/patients">
+<span class="text-label-bold font-label-bold">Patients</span>
+</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors px-2" href="/reception">
+<span class="text-label-bold font-label-bold">Schedule</span>
+</a>
+<a class="h-full flex items-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors px-2" href="/analytics">
+<span class="text-label-bold font-label-bold">Reports</span>
+</a>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors hidden sm:block">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<img alt="Dr. Smith's Profile" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A professional headshot of a mature female doctor wearing a white lab coat over a light blue shirt, smiling warmly in a bright, modern clinic setting with soft focus background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARhA7JXKdKfhVyZgF15kigKAeMatRgt1JwGb8ir44NojHhoXg-QVqRayM9ILE7H83ua1Vz7vjjmiG4nyEFAwSh-q1-OasyYDoY8lcJ4DNxNgz7p0CT8Jow8Vo96nthUQVhYJQ7TtxX2TThyeCSCETT7d7K7hDDywKmcVvwgXUJDmwXa26p7ht5ouWnJtginoUYicOT54cHhO5oLnaK6yD7Av-Gyt6Ld-voHJFtNsjn5tyQu0o9Eb5p"/>
+</div>
+</header>
+<!-- Canvas -->
+<div class="p-md md:p-lg flex-1 overflow-y-auto">
+<div class="flex flex-col lg:flex-row gap-gutter h-full">
+<!-- Left Column: Search & Registration -->
+<div class="flex-1 flex flex-col gap-gutter">
+<!-- Search Panel -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+<h2 class="text-headline-sm font-headline-sm text-on-surface mb-4">Patient Search</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search by Name, Phone, or ID..." type="text"/>
+</div>
+<div class="mt-4 p-3 bg-surface-container rounded-lg border border-outline-variant/50 flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-0.5">info</span>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Search existing records to prevent duplicates before registering a new patient.</p>
+</div>
+</div>
+<!-- Registration Form -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex-1">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">New Registration</h2>
+<span class="px-2 py-1 bg-surface-container-high text-on-surface-variant rounded text-label-bold font-label-bold">Walk-in</span>
+</div>
+<form class="space-y-6">
+<!-- Demographics -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="text-label-bold font-label-bold text-on-surface">First Name *</label>
+<input class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="text-label-bold font-label-bold text-on-surface">Last Name *</label>
+<input class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="text-label-bold font-label-bold text-on-surface">Date of Birth *</label>
+<input class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20 text-on-surface-variant" type="date"/>
+</div>
+<div class="space-y-1">
+<label class="text-label-bold font-label-bold text-on-surface">Gender</label>
+<select class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20">
+<option>Select...</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+</div>
+</div>
+<hr class="border-outline-variant/50"/>
+<!-- Contact -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="text-label-bold font-label-bold text-on-surface">Phone Number *</label>
+<input class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20" type="tel"/>
+</div>
+<div class="space-y-1">
+<label class="text-label-bold font-label-bold text-on-surface">Email</label>
+<input class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20" type="email"/>
+</div>
+</div>
+<div class="space-y-1">
+<label class="text-label-bold font-label-bold text-on-surface">Reason for Visit</label>
+<textarea class="w-full px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md focus:border-primary focus:ring-2 focus:ring-primary/20" rows="2"></textarea>
+</div>
+<!-- Actions -->
+<div class="flex items-center justify-end gap-4 pt-4">
+<button class="px-4 py-2 text-primary text-body-md font-body-md font-medium hover:bg-primary-container/10 rounded-lg transition-colors" type="button">Clear</button>
+<button class="px-6 py-2 bg-primary text-on-primary rounded-lg text-body-md font-body-md font-medium shadow-sm hover:bg-primary/90 transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-sm">confirmation_number</span>
+                                    Generate Ticket
+                                </button>
+</div>
+</form>
+</div>
+</div>
+<!-- Right Column: Queue & Preview -->
+<div class="w-full lg:w-[400px] flex flex-col gap-gutter">
+<!-- Ticket Preview -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-body-lg font-body-lg font-semibold text-on-surface">Check Print</h3>
+<button class="p-1.5 text-on-surface-variant hover:bg-surface-container rounded transition-colors" title="Print">
+<span class="material-symbols-outlined text-[20px]">print</span>
+</button>
+</div>
+<!-- Simulated Receipt -->
+<div class="bg-surface p-6 rounded-lg border border-dashed border-outline-variant/60 flex flex-col items-center text-center font-data-mono space-y-4">
+<div>
+<h4 class="font-bold text-lg">MAIN CITY CLINIC</h4>
+<p class="text-xs text-on-surface-variant">123 Healthcare Ave.</p>
+</div>
+<div class="w-full border-t border-dashed border-outline-variant/50"></div>
+<div class="space-y-1">
+<p class="text-xs text-on-surface-variant">Token Number</p>
+<p class="text-3xl font-bold text-primary">A-042</p>
+</div>
+<div class="w-full text-left space-y-2 text-sm">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Date:</span>
+<span>Oct 24, 2023</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Time:</span>
+<span>09:41 AM</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Dept:</span>
+<span>General Practice</span>
+</div>
+</div>
+<div class="w-full border-t border-dashed border-outline-variant/50"></div>
+<p class="text-xs text-on-surface-variant">Please wait in the main lobby.</p>
+</div>
+</div>
+<!-- Queue Status -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-0 flex-1 flex flex-col overflow-hidden">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="text-body-lg font-body-lg font-semibold text-on-surface">Current Queue</h3>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container rounded-full text-label-bold font-label-bold text-[10px]">4 Waiting</span>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- Queue Items -->
+<div class="p-3 border-b border-outline-variant/30 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary-container/20 flex items-center justify-center text-primary font-bold font-data-mono">A40</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Sarah Jenkins</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">09:15 AM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-sm">monitor_heart</span>
+</div>
+<div class="p-3 border-b border-outline-variant/30 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary-container/20 flex items-center justify-center text-primary font-bold font-data-mono">A41</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Michael Chang</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">09:22 AM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-sm">schedule</span>
+</div>
+<div class="p-3 border-b border-outline-variant/30 flex items-center justify-between hover:bg-surface transition-colors cursor-pointer bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-tertiary-container/20 flex items-center justify-center text-tertiary font-bold font-data-mono">B12</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Elena Rodriguez</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">09:30 AM · Bloodwork</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-sm">schedule</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+    <script src="/assets/app.js?v=20260821"></script>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var loader = document.getElementById('cf-loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(function() { loader.remove(); }, 350);
+                }
+            }, 200);
+        });
+    </script>
+</body></html>

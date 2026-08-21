@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html lang="uz"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClinicFlow ERP - Shifokor shaxsiy kabineti</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "surface-container-lowest": "#ffffff",
+                            "on-error-container": "#93000a",
+                            "on-tertiary": "#ffffff",
+                            "tertiary-container": "#49596f",
+                            "background": "#f7f9fb",
+                            "on-tertiary-fixed": "#0b1c30",
+                            "on-secondary-fixed-variant": "#004f4f",
+                            "on-primary-container": "#bcceff",
+                            "error-container": "#ffdad6",
+                            "on-tertiary-fixed-variant": "#38485d",
+                            "surface-variant": "#e0e3e5",
+                            "on-secondary-fixed": "#002020",
+                            "secondary": "#006a6a",
+                            "surface-container-high": "#e6e8ea",
+                            "on-secondary": "#ffffff",
+                            "on-surface": "#191c1e",
+                            "surface-container": "#eceef0",
+                            "on-background": "#191c1e",
+                            "error": "#ba1a1a",
+                            "surface-container-low": "#f2f4f6",
+                            "secondary-fixed-dim": "#76d6d5",
+                            "tertiary": "#324257",
+                            "on-surface-variant": "#434653",
+                            "on-primary": "#ffffff",
+                            "surface": "#f7f9fb",
+                            "surface-container-highest": "#e0e3e5",
+                            "surface-bright": "#f7f9fb",
+                            "secondary-fixed": "#93f2f2",
+                            "primary-fixed": "#d9e2ff",
+                            "primary": "#003c90",
+                            "on-error": "#ffffff",
+                            "tertiary-fixed-dim": "#b7c8e1",
+                            "surface-tint": "#1d59c1",
+                            "surface-dim": "#d8dadc",
+                            "inverse-primary": "#b0c6ff",
+                            "inverse-on-surface": "#eff1f3",
+                            "inverse-surface": "#2d3133",
+                            "tertiary-fixed": "#d3e4fe",
+                            "on-primary-fixed-variant": "#00419c",
+                            "outline": "#737784",
+                            "primary-fixed-dim": "#b0c6ff",
+                            "on-secondary-container": "#006e6e",
+                            "outline-variant": "#c3c6d5",
+                            "on-tertiary-container": "#bfd0ea",
+                            "secondary-container": "#90efef",
+                            "on-primary-fixed": "#001945",
+                            "primary-container": "#0f52ba"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "xs": "4px",
+                            "sm": "8px",
+                            "base": "4px",
+                            "container-max": "1440px",
+                            "md": "16px",
+                            "lg": "24px",
+                            "gutter": "20px",
+                            "xl": "32px"
+                    },
+                    "fontFamily": {
+                            "headline-md": ["Inter"],
+                            "headline-sm": ["Inter"],
+                            "body-sm": ["Inter"],
+                            "body-md": ["Inter"],
+                            "display-lg": ["Inter"],
+                            "label-bold": ["Inter"],
+                            "data-mono": ["Inter"],
+                            "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                            "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                            "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                            "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f7f9fb; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+    </style>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="/assets/app.css?v=20260821">
+</head>
+<body class="bg-background text-on-background min-h-screen flex"><div id="cf-loader"><div><div class="spinner"></div><div class="text">ClinicFlow ERP yuklanmoqda...</div></div></div>
+<!-- SideNavBar (From JSON) -->
+<aside class="hidden md:flex bg-surface-container-lowest dark:bg-surface-container-low flex-col h-screen w-[240px] border-r border-outline-variant dark:border-outline shadow-none py-lg px-md fixed left-0 top-0 z-20">
+<div class="mb-lg flex items-center gap-sm">
+<span aria-label="Clinic Logo" class="material-symbols-outlined text-primary text-3xl icon-fill">local_hospital</span>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">MediFlow ERP</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Clinic Management</p>
+</div>
+</div>
+<nav class="flex-1 space-y-sm">
+<a aria-current="page" class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container dark:bg-primary-container dark:text-on-primary-container font-semibold rounded-lg active:scale-95 transition-transform" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Overview</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:bg-surface-container-highest rounded-lg transition-colors duration-200 active:scale-95" href="/patients">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Patients</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:bg-surface-container-highest rounded-lg transition-colors duration-200 active:scale-95" href="/reception">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md text-body-md">Schedule</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:bg-surface-container-highest rounded-lg transition-colors duration-200 active:scale-95" href="/cashier">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Billing</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:bg-surface-container-highest rounded-lg transition-colors duration-200 active:scale-95" href="/analytics">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Analytics</span>
+</a>
+</nav>
+<button class="mt-auto mb-md w-full bg-primary text-on-primary py-sm rounded-lg font-body-md text-body-md hover:bg-primary-container hover:text-on-primary-container transition-colors active:scale-95 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">add</span>
+            Add Patient
+        </button>
+<div class="border-t border-outline-variant dark:border-outline pt-sm space-y-xs">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:bg-surface-container-highest rounded-lg transition-colors duration-200" href="/settings">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high dark:text-on-surface-variant dark:hover:bg-surface-container-highest rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-[240px] flex flex-col min-h-screen">
+<!-- TopNavBar (From JSON) -->
+<header class="bg-surface dark:bg-surface-dim h-16 border-b border-outline-variant dark:border-outline shadow-none flex items-center justify-between px-lg w-full sticky top-0 z-10 hidden md:flex">
+<div class="flex items-center">
+<!-- Search bar on left -->
+<div class="relative focus-within:ring-2 focus-within:ring-primary rounded-full bg-surface-container-low px-md py-xs flex items-center min-w-[300px]">
+<span class="material-symbols-outlined text-on-surface-variant mr-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md text-on-surface outline-none" placeholder="Qidirish..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-error bg-error-container hover:bg-error hover:text-on-error px-md py-xs rounded-full font-label-bold text-label-bold transition-colors">Emergency</button>
+<div class="flex gap-sm">
+<button class="p-xs rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors hover:text-on-surface"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-xs rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors hover:text-on-surface"><span class="material-symbols-outlined">chat_bubble</span></button>
+<button class="p-xs rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors hover:text-on-surface"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Doctor Profile" class="w-full h-full object-cover" data-alt="Professional headshot portrait of a Central Asian male doctor in his 40s wearing a crisp white medical coat over a blue shirt, smiling warmly in a bright, modern clinical setting with soft natural light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6sZC-Q-rg-6qwtvwjWTgh1Bp0PmpXRcOSL1hZZHGePcSdrTcCsZj3JhmSYndULhNpVARzfDCtK2znlJ_dkBf9OgXI_LSaLuvLoM-yRvB_lPs5R0_4Tp8GSMY26gOZQ3bJmxqEGmjhO4EawYm-TAzuJ63jJEBDgI2irEs4DER9cOMYtTYMovlu75RInr7aAOzqPcenyaozPwJBozMjlb01VEC4kE1u1ZUVgWdHFoisuB3nGhFfp5F8"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<main class="flex-1 p-md md:p-xl lg:px-12 max-w-container-max mx-auto w-full">
+<!-- Welcome Header -->
+<div class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-xs">Xush kelibsiz, Dr. Alisher Vohidov</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                        24 Oktyabr, 2023 yil, Seshanba
+                    </p>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-bold text-label-bold hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm flex items-center gap-xs w-max">
+<span class="material-symbols-outlined">add</span> Yangi ko'rik
+                </button>
+</div>
+<!-- KPI Cards Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md mb-xl">
+<!-- KPI 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-sm bg-primary-fixed rounded-lg text-primary">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<span class="font-label-bold text-label-bold text-secondary bg-secondary-fixed-dim bg-opacity-20 px-xs py-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +12%
+                        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-xs">Bugungi bemorlar</p>
+<p class="font-headline-md text-headline-md text-on-surface">24 <span class="font-body-sm text-body-sm text-on-surface-variant font-normal">/ 30 reja</span></p>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-sm bg-tertiary-fixed rounded-lg text-tertiary">
+<span class="material-symbols-outlined">stethoscope</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-xs">Jami ko'riklar (oy)</p>
+<p class="font-headline-md text-headline-md text-on-surface">412</p>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-sm bg-secondary-fixed rounded-lg text-secondary">
+<span class="material-symbols-outlined">star</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-xs">Samaradorlik reytingi</p>
+<div class="flex items-end gap-sm">
+<p class="font-headline-md text-headline-md text-on-surface">4.9</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-1">/ 5.0</p>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<div class="p-sm bg-surface-container-highest rounded-lg text-on-surface">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant bg-surface-variant px-xs py-1 rounded">Oktyabr</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-xs">Joriy oylik maosh</p>
+<p class="font-headline-md text-headline-md text-on-surface">12,450,000 <span class="font-body-sm text-body-sm font-normal">UZS</span></p>
+</div>
+</div>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-md lg:gap-lg">
+<!-- Left Column (Wider): Schedule & Patients -->
+<div class="lg:col-span-2 flex flex-col gap-lg">
+<!-- Today's Schedule -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg flex flex-col h-full">
+<div class="flex justify-between items-center mb-md border-b border-surface-container pb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Bugungi Jadval</h3>
+<button class="text-primary font-label-bold text-label-bold hover:underline">Barchasini ko'rish</button>
+</div>
+<div class="flex-1 space-y-0">
+<!-- Timeline Item 1 -->
+<div class="flex gap-md py-sm border-b border-surface-container last:border-0 relative">
+<div class="w-16 flex-shrink-0 flex flex-col items-end">
+<span class="font-data-mono text-data-mono text-on-surface">09:00</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">30 daq</span>
+</div>
+<div class="w-3 h-3 rounded-full bg-secondary mt-1 flex-shrink-0 z-10 ring-4 ring-surface-container-lowest"></div>
+<div class="absolute left-[78px] top-6 bottom-[-16px] w-[2px] bg-surface-container last:hidden"></div>
+<div class="flex-1 bg-surface rounded-lg p-sm border border-surface-variant flex justify-between items-center">
+<div>
+<p class="font-body-md text-body-md font-semibold text-on-surface">Rustamov Dilshod</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Yurak qon tomir nazorati</p>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-1 rounded font-label-bold text-label-bold">Yakunlandi</span>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="flex gap-md py-sm border-b border-surface-container last:border-0 relative">
+<div class="w-16 flex-shrink-0 flex flex-col items-end">
+<span class="font-data-mono text-data-mono text-primary font-bold">09:45</span>
+<span class="font-body-sm text-body-sm text-primary">45 daq</span>
+</div>
+<div class="w-3 h-3 rounded-full bg-primary mt-1 flex-shrink-0 z-10 ring-4 ring-surface-container-lowest animate-pulse"></div>
+<div class="absolute left-[78px] top-6 bottom-[-16px] w-[2px] bg-surface-container last:hidden"></div>
+<div class="flex-1 bg-primary-fixed-dim bg-opacity-20 rounded-lg p-sm border border-primary-fixed flex justify-between items-center shadow-sm">
+<div>
+<p class="font-body-md text-body-md font-bold text-on-surface">Azizova Malika</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Birlamchi ko'rik - Ekokardiyografiya</p>
+</div>
+<span class="bg-primary text-on-primary px-2 py-1 rounded font-label-bold text-label-bold flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">videocam</span> Qabulda</span>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="flex gap-md py-sm border-b border-surface-container last:border-0 relative">
+<div class="w-16 flex-shrink-0 flex flex-col items-end opacity-60">
+<span class="font-data-mono text-data-mono text-on-surface">10:30</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">15 daq</span>
+</div>
+<div class="w-3 h-3 rounded-full bg-outline-variant mt-1 flex-shrink-0 z-10 ring-4 ring-surface-container-lowest"></div>
+<div class="absolute left-[78px] top-6 bottom-[-16px] w-[2px] bg-surface-container last:hidden"></div>
+<div class="flex-1 rounded-lg p-sm border border-transparent flex justify-between items-center opacity-70">
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Karimov Anvar</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tahlil natijalari muhokamasi</p>
+</div>
+<span class="text-outline font-label-bold text-label-bold border border-outline px-2 py-1 rounded">Kutilmoqda</span>
+</div>
+</div>
+</div>
+</div>
+<!-- My Patients (Recent) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col">
+<div class="flex justify-between items-center mb-sm border-b border-surface-container pb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Bemorlarim <span class="font-body-sm text-on-surface-variant font-normal ml-2">(So'nggi 7 kun)</span></h3>
+<div class="flex gap-xs">
+<button class="p-xs bg-surface-container-low rounded text-on-surface-variant hover:bg-surface-variant"><span class="material-symbols-outlined text-[20px]">filter_list</span></button>
+<button class="p-xs bg-surface-container-low rounded text-on-surface-variant hover:bg-surface-variant"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-surface-container text-on-surface-variant font-label-bold text-label-bold uppercase">
+<th class="py-xs pr-sm font-medium">Bemor ID</th>
+<th class="py-xs px-sm font-medium">F.I.Sh</th>
+<th class="py-xs px-sm font-medium">Oxirgi tashrif</th>
+<th class="py-xs pl-sm font-medium text-right">Amallar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-surface-container hover:bg-surface transition-colors">
+<td class="py-sm pr-sm font-data-mono text-body-sm text-outline">#PT-8492</td>
+<td class="py-sm px-sm font-body-md text-on-surface font-medium">Narzullayev Bekzod</td>
+<td class="py-sm px-sm font-body-sm text-on-surface-variant">Kecha, 14:20</td>
+<td class="py-sm pl-sm text-right">
+<button class="text-primary hover:bg-primary-fixed-dim hover:bg-opacity-20 p-1 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">folder_open</span></button>
+</td>
+</tr>
+<tr class="border-b border-surface-container hover:bg-surface transition-colors">
+<td class="py-sm pr-sm font-data-mono text-body-sm text-outline">#PT-7104</td>
+<td class="py-sm px-sm font-body-md text-on-surface font-medium">Olimova Dildora</td>
+<td class="py-sm px-sm font-body-sm text-on-surface-variant">18 Okt, 09:00</td>
+<td class="py-sm pl-sm text-right">
+<button class="text-primary hover:bg-primary-fixed-dim hover:bg-opacity-20 p-1 rounded transition-colors"><span class="material-symbols-outlined text-[20px]">folder_open</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<button class="mt-sm w-full py-xs text-center font-label-bold text-label-bold text-primary hover:bg-surface-container-low rounded transition-colors">Barcha bemorlarni ko'rish</button>
+</div>
+</div>
+<!-- Right Column (Narrower): Messages & Notifications -->
+<div class="lg:col-span-1 flex flex-col gap-lg h-full">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col flex-1">
+<div class="flex justify-between items-center mb-md border-b border-surface-container pb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-xs">
+                                Bildirishnomalar
+                                <span class="bg-error text-on-error font-label-bold text-[10px] px-1.5 py-0.5 rounded-full">2</span>
+</h3>
+</div>
+<div class="space-y-sm flex-1">
+<!-- Alert Notification -->
+<div class="bg-error-container bg-opacity-30 border border-error-container rounded-lg p-sm flex gap-sm">
+<span class="material-symbols-outlined text-error mt-0.5">warning</span>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Laboratoriya natijalari tayyor</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-1">Bemor: Azizova M. Qon tahlili natijalari tanqidiy chegarada.</p>
+<button class="font-label-bold text-label-bold text-error hover:underline">Zudlik bilan ko'rish</button>
+</div>
+</div>
+<!-- System Message -->
+<div class="bg-surface rounded-lg p-sm border border-surface-variant flex gap-sm">
+<span class="material-symbols-outlined text-tertiary mt-0.5">campaign</span>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Yangi ERP yangilanishi</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tizim bugun tunda texnik xizmat ko'rsatish uchun 1 soatga o'chiriladi.</p>
+<span class="font-body-sm text-[11px] text-outline mt-1 block">1 soat oldin</span>
+</div>
+</div>
+<!-- Internal Message -->
+<div class="bg-surface rounded-lg p-sm border border-surface-variant flex gap-sm">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant flex-shrink-0 bg-surface-container-high flex justify-center items-center">
+<span class="font-label-bold text-on-surface">DA</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-medium text-on-surface">Dr. Akmalov</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Ertangi konsilium bo'yicha hujjatlarni yubordim, ko'rib chiqing.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Actions Mini Bento -->
+<div class="grid grid-cols-2 gap-sm">
+<button class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm flex flex-col items-center justify-center gap-xs hover:bg-surface-container-low transition-colors text-on-surface">
+<span class="material-symbols-outlined text-primary">edit_document</span>
+<span class="font-label-bold text-label-bold text-center">Tezkor<br/>Qayd</span>
+</button>
+<button class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm flex flex-col items-center justify-center gap-xs hover:bg-surface-container-low transition-colors text-on-surface">
+<span class="material-symbols-outlined text-tertiary">prescriptions</span>
+<span class="font-label-bold text-label-bold text-center">Retsept<br/>Yozish</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+    <script src="/assets/app.js?v=20260821"></script>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var loader = document.getElementById('cf-loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(function() { loader.remove(); }, 350);
+                }
+            }, 200);
+        });
+    </script>
+</body></html>

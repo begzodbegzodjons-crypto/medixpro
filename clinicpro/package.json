@@ -1,0 +1,16 @@
+{
+  "name": "clinicflow-erp",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port=3000",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@tidbcloud/serverless": "^0.3.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

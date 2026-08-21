@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ClinicFlow ERP - Shifokor kabineti</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-background": "#191c1e",
+                            "inverse-primary": "#b0c6ff",
+                            "outline-variant": "#c3c6d5",
+                            "secondary-fixed-dim": "#76d6d5",
+                            "tertiary-fixed": "#d3e4fe",
+                            "surface": "#f7f9fb",
+                            "on-secondary-fixed": "#002020",
+                            "primary-container": "#0f52ba",
+                            "on-primary-fixed-variant": "#00419c",
+                            "surface-container-low": "#f2f4f6",
+                            "surface-container-high": "#e6e8ea",
+                            "surface-variant": "#e0e3e5",
+                            "surface-dim": "#d8dadc",
+                            "on-surface-variant": "#434653",
+                            "on-tertiary": "#ffffff",
+                            "on-tertiary-container": "#bfd0ea",
+                            "tertiary": "#324257",
+                            "surface-container": "#eceef0",
+                            "on-primary-container": "#bcceff",
+                            "primary-fixed": "#d9e2ff",
+                            "inverse-on-surface": "#eff1f3",
+                            "surface-bright": "#f7f9fb",
+                            "inverse-surface": "#2d3133",
+                            "surface-container-lowest": "#ffffff",
+                            "on-secondary": "#ffffff",
+                            "on-tertiary-fixed": "#0b1c30",
+                            "secondary-fixed": "#93f2f2",
+                            "on-secondary-fixed-variant": "#004f4f",
+                            "error-container": "#ffdad6",
+                            "surface-tint": "#1d59c1",
+                            "tertiary-fixed-dim": "#b7c8e1",
+                            "on-surface": "#191c1e",
+                            "background": "#f7f9fb",
+                            "primary-fixed-dim": "#b0c6ff",
+                            "surface-container-highest": "#e0e3e5",
+                            "on-primary-fixed": "#001945",
+                            "on-primary": "#ffffff",
+                            "on-error-container": "#93000a",
+                            "on-tertiary-fixed-variant": "#38485d",
+                            "secondary": "#006a6a",
+                            "secondary-container": "#90efef",
+                            "on-secondary-container": "#006e6e",
+                            "primary": "#003c90",
+                            "outline": "#737784",
+                            "on-error": "#ffffff",
+                            "error": "#ba1a1a",
+                            "tertiary-container": "#49596f"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "container-max": "1440px",
+                            "md": "16px",
+                            "gutter": "20px",
+                            "xs": "4px",
+                            "base": "4px",
+                            "lg": "24px",
+                            "xl": "32px",
+                            "sm": "8px"
+                    },
+                    "fontFamily": {
+                            "body-lg": ["Inter"],
+                            "headline-md": ["Inter"],
+                            "label-bold": ["Inter"],
+                            "display-lg": ["Inter"],
+                            "data-mono": ["Inter"],
+                            "body-md": ["Inter"],
+                            "headline-sm": ["Inter"],
+                            "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                            "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                            "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                            "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="/assets/app.css?v=20260821">
+</head>
+<body class="bg-background text-on-background font-body-md antialiased h-screen flex flex-col overflow-hidden"><div id="cf-loader"><div><div class="spinner"></div><div class="text">ClinicFlow ERP yuklanmoqda...</div></div></div>
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest text-primary text-headline-sm font-headline-sm flex justify-between items-center w-full px-md h-16 sticky top-0 z-50 border-b border-outline-variant flat no shadows">
+<div class="flex items-center gap-lg">
+<div class="text-headline-sm font-headline-sm font-bold text-primary">ClinicFlow ERP</div>
+<nav class="hidden md:flex items-center gap-md">
+<a class="text-on-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-colors px-3 py-2 rounded-md" href="/dashboard">Dashboard</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-label-bold text-label-bold hover:bg-surface-container-high transition-colors px-3 py-2 opacity-80 transition-opacity" href="/patients">Patients</a>
+<a class="text-on-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-colors px-3 py-2 rounded-md" href="/reception">Schedule</a>
+<a class="text-on-surface-variant font-label-bold text-label-bold hover:bg-surface-container-high transition-colors px-3 py-2 rounded-md" href="/analytics">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<img alt="Dr. Smith's Profile" class="w-8 h-8 rounded-full ml-sm object-cover border border-outline-variant" data-alt="A small circular profile picture of a doctor in a white coat. The doctor looks professional and friendly, set against a clean, light blue background. Modern corporate healthcare style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACTXcvQ4JstYCyp4YIoban-sD85r2816bFvjNFUYcSp6A2N5DI9BRhwPUpiyukaAy7CQdWuQ8SYANPXJC_eX1-vaJSiJ2CoKtLkQ7dE1onR1OuwfO2S_lO-uJmaKRgtafFku4alQiWXKOP9HaeVRPBxwL1uKYYr2wd49FscGi7ba1cj1aQARh48iiECWDXuMWudJ9yKIoOFht7Br5BBLQtySvrx3HFK0P_KpRNJoGXcm_PZ5vjiwDj"/>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-surface flex flex-col h-full w-[240px] py-md border-r border-outline-variant hidden md:flex shrink-0">
+<div class="px-md mb-lg">
+<div class="text-body-lg font-bold text-on-surface">Main City Clinic</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Switch Clinic</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs px-sm overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-on-surface-variant text-label-bold font-label-bold hover:bg-surface-container transition-all" href="/dashboard">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                    Overview
+                </a>
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-primary font-bold bg-primary-container/10 text-label-bold font-label-bold hover:bg-surface-container transition-all scale-95 transition-transform duration-150" href="/reception">
+<span class="material-symbols-outlined text-[20px]" data-icon="group" data-weight="fill" style="font-variation-settings: 'FILL' 1;">group</span>
+                    Queue
+                </a>
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-on-surface-variant text-label-bold font-label-bold hover:bg-surface-container transition-all" href="/patient-history">
+<span class="material-symbols-outlined text-[20px]" data-icon="history_edu">history_edu</span>
+                    Medical Records
+                </a>
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-on-surface-variant text-label-bold font-label-bold hover:bg-surface-container transition-all" href="/cashier">
+<span class="material-symbols-outlined text-[20px]" data-icon="payments">payments</span>
+                    Billing
+                </a>
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-on-surface-variant text-label-bold font-label-bold hover:bg-surface-container transition-all" href="/invoice">
+<span class="material-symbols-outlined text-[20px]" data-icon="inventory_2">inventory_2</span>
+                    Inventory
+                </a>
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-on-surface-variant text-label-bold font-label-bold hover:bg-surface-container transition-all" href="/settings">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+                    Clinic Settings
+                </a>
+</nav>
+<div class="px-md mt-auto pt-md border-t border-outline-variant flex flex-col gap-xs">
+<button class="w-full bg-primary text-on-primary py-2 rounded-lg text-label-bold font-label-bold hover:shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-shadow mb-sm">New Appointment</button>
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-on-surface-variant text-label-bold font-label-bold hover:bg-surface-container transition-all" href="/analytics">
+<span class="material-symbols-outlined text-[20px]" data-icon="analytics">analytics</span>
+                    System Status
+                </a>
+<a class="flex items-center gap-sm px-3 py-2 rounded-md text-on-surface-variant text-label-bold font-label-bold hover:bg-surface-container transition-all" href="/">
+<span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
+                    Logout
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden bg-background">
+<!-- Left Panel: Medical History -->
+<section class="w-full md:w-1/4 h-full border-r border-outline-variant bg-surface-container-lowest flex flex-col">
+<div class="p-sm border-b border-outline-variant bg-surface-container-low">
+<div class="flex items-center gap-sm mb-xs">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A portrait of a male patient in his mid-40s, looking neutral. Clean, sterile lighting, light grey background. Modern medical software context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS80soqoKLFRX8nOSbfXNDcNbjaOOT6ZSUYJBkRqX6ZmbRm_t5IGdaiCUwEhC5x0SEYMt3UVweLTiwjNgKAWSQnHgnKNvChm2HPFYPyVPGcmMtA2K-YXHN3ehWpR2u5WCPsv9lFY9Hmv6pEKEWDUJ93g2mNOh1lgG-yRHURsQfytU6qZ3lZcReZ3E8B2aiMtuuWpJugVBagJTRTT-LwcdS74q3rTu2k_2C0H8WLlYoWTdXR7eOPgDu"/>
+<div>
+<h2 class="text-body-lg font-headline-sm font-semibold">Robert Jensen</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">DOB: 12/04/1978 • ID: P-88219</p>
+</div>
+</div>
+<div class="flex gap-2 mt-2">
+<span class="px-2 py-1 bg-secondary-container/30 text-on-secondary-container rounded text-label-bold font-label-bold border border-secondary-container/50">Hypertension</span>
+<span class="px-2 py-1 bg-error-container/30 text-on-error-container rounded text-label-bold font-label-bold border border-error-container/50">Allergy: Penicillin</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-md custom-scrollbar">
+<h3 class="text-label-bold font-label-bold text-on-surface-variant mb-md uppercase tracking-wider">History Timeline</h3>
+<div class="relative border-l border-outline-variant ml-3 space-y-lg">
+<!-- Timeline Item -->
+<div class="relative pl-md">
+<span class="absolute -left-[5px] top-1 w-[10px] h-[10px] rounded-full bg-primary border-2 border-surface-container-lowest"></span>
+<div class="text-label-bold font-label-bold text-primary mb-1">Oct 12, 2023</div>
+<div class="bg-surface p-sm rounded-lg border border-outline-variant shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+<div class="text-body-md font-body-md font-medium">Routine Checkup</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">BP elevated (145/90). Advised lifestyle changes.</div>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="relative pl-md">
+<span class="absolute -left-[5px] top-1 w-[10px] h-[10px] rounded-full bg-surface-variant border-2 border-surface-container-lowest"></span>
+<div class="text-label-bold font-label-bold text-on-surface-variant mb-1">Mar 05, 2023</div>
+<div class="bg-surface p-sm rounded-lg border border-outline-variant">
+<div class="text-body-md font-body-md font-medium">Lab Results</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Lipid panel normal. Hba1c 5.6%.</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Center Panel: Consultation Notes -->
+<section class="w-full md:w-2/4 h-full flex flex-col bg-surface-container-lowest">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h2 class="text-headline-sm font-headline-sm">Current Consultation</h2>
+<span class="px-2 py-1 bg-surface-variant text-on-surface-variant rounded text-label-bold font-label-bold border border-outline-variant">10:30 AM - In Progress</span>
+</div>
+<div class="flex-1 overflow-y-auto p-md custom-scrollbar space-y-md">
+<div>
+<label class="block text-label-bold font-label-bold text-on-surface-variant mb-xs">Chief Complaint</label>
+<input class="w-full rounded-lg border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 p-sm text-body-md font-body-md bg-surface transition-all" type="text" value="Persistent headache for 3 days"/>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div>
+<label class="block text-label-bold font-label-bold text-on-surface-variant mb-xs">Vitals: Temp (°F)</label>
+<input class="w-full rounded-lg border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 p-sm text-body-md font-body-md bg-surface" type="text" value="98.6"/>
+</div>
+<div>
+<label class="block text-label-bold font-label-bold text-on-surface-variant mb-xs">Vitals: BP</label>
+<input class="w-full rounded-lg border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 p-sm text-body-md font-body-md bg-surface" type="text" value="138/85"/>
+</div>
+</div>
+<div>
+<label class="block text-label-bold font-label-bold text-on-surface-variant mb-xs">Clinical Notes</label>
+<textarea class="w-full rounded-lg border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 p-sm text-body-md font-body-md h-32 bg-surface resize-none custom-scrollbar transition-all" placeholder="Enter clinical observations..."></textarea>
+</div>
+<div>
+<label class="block text-label-bold font-label-bold text-on-surface-variant mb-xs">Diagnosis</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full rounded-lg border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 pl-10 p-sm text-body-md font-body-md bg-surface" placeholder="Search ICD-10 codes..." type="text"/>
+</div>
+<div class="mt-2 flex gap-2">
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-label-bold font-label-bold border border-primary/20 flex items-center gap-1">
+                                G44.2 - Tension-type headache
+                                <span class="material-symbols-outlined text-[14px] cursor-pointer" data-icon="close">close</span>
+</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel: Prescriptions -->
+<section class="w-full md:w-1/4 h-full border-l border-outline-variant bg-surface-container-low flex flex-col">
+<div class="p-md border-b border-outline-variant flex items-center justify-between">
+<h2 class="text-headline-sm font-headline-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="prescriptions">prescriptions</span>
+                        Rx Generator
+                    </h2>
+</div>
+<div class="flex-1 p-sm overflow-y-auto custom-scrollbar">
+<div class="mb-sm text-label-bold font-label-bold text-on-surface-variant">Suggested based on G44.2</div>
+<div class="space-y-sm">
+<!-- Medicine Card -->
+<div class="bg-surface p-sm rounded-lg border border-outline-variant hover:border-primary cursor-pointer transition-colors group">
+<div class="flex justify-between items-start mb-1">
+<div class="text-body-md font-body-md font-semibold group-hover:text-primary transition-colors">Ibuprofen 400mg</div>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[20px]" data-icon="add_circle">add_circle</span></button>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">1 tab PO Q6H PRN pain</div>
+</div>
+<!-- Medicine Card -->
+<div class="bg-surface p-sm rounded-lg border border-outline-variant hover:border-primary cursor-pointer transition-colors group">
+<div class="flex justify-between items-start mb-1">
+<div class="text-body-md font-body-md font-semibold group-hover:text-primary transition-colors">Acetaminophen 500mg</div>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[20px]" data-icon="add_circle">add_circle</span></button>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">1-2 tabs PO Q8H PRN pain</div>
+</div>
+</div>
+<div class="mt-md pt-md border-t border-outline-variant">
+<div class="text-label-bold font-label-bold text-on-surface-variant mb-sm">Active Prescription</div>
+<div class="bg-surface p-sm rounded-lg border border-primary/30 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="flex justify-between items-start mb-1">
+<div class="text-body-md font-body-md font-semibold text-primary">Ibuprofen 400mg</div>
+<button class="text-error hover:text-error-container"><span class="material-symbols-outlined text-[18px]" data-icon="delete">delete</span></button>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">1 tab PO Q6H PRN pain</div>
+<div class="text-label-bold font-label-bold text-on-surface-variant mt-2 border-t border-outline-variant/50 pt-1">Dispense: 20 tabs | Refills: 0</div>
+</div>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant bg-surface-container-lowest">
+<button class="w-full bg-surface text-primary border border-outline-variant py-2 rounded-lg text-label-bold font-label-bold hover:bg-surface-container hover:shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="print">print</span>
+                        Print Rx (XPrinter)
+                    </button>
+<button class="w-full mt-sm bg-primary text-on-primary py-2 rounded-lg text-label-bold font-label-bold hover:shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-shadow">
+                        Finalize Visit
+                    </button>
+</div>
+</section>
+</main>
+</div>
+    <script src="/assets/app.js?v=20260821"></script>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var loader = document.getElementById('cf-loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    setTimeout(function() { loader.remove(); }, 350);
+                }
+            }, 200);
+        });
+    </script>
+</body></html>
