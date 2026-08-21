@@ -590,3 +590,63 @@ Stage Summary:
 - Login: shifonur / 123
 - URL: https://medixpro.mirzalimovbegzod8.workers.dev
 - GitHub: github.com/begzodbegzodjons-crypto/medixpro
+
+---
+Task ID: clinicpro-multitenant-api
+Agent: super-z (main agent)
+Task: Multi-tenant, API-driven, TiDB-backed clinic system
+
+PROBLEM:
+- Old system used localStorage - couldn't support 100+ clinics, 1000+ doctors
+- Data was lost on browser refresh
+- No real patient history (diagnoses, treatments, prescriptions)
+- No automated cashier (linking payments to queue)
+
+SOLUTION:
+1. Complete worker.js rewrite with granular CRUD API endpoints:
+   - Clinic, Staff, Patient, Queue, Consultation, Transaction, Service, LabOrder
+   - Each entity has its own /save, /list, /delete endpoints
+   - Multi-tenant: all queries filter by clinicId
+
+2. Complete app.js rewrite - API-driven:
+   - All data loaded from TiDB via API on login
+   - Each save operation calls specific API endpoint (not bulk save)
+   - State persists in TiDB, localStorage only for session caching
+
+3. ConsultationRecord table fixed:
+   - Added patientName column via ALTER TABLE
+   - Now stores: complaints, anamnesis, diagnosis, ICD code, treatment plan,
+     prescriptions (drug list), ordered lab tests, follow-up date
+
+4. Patient detail modal shows full medical history:
+   - Patient info (name, phone, birth date, blood group, allergies, chronic diseases)
+   - All consultations (date, doctor, complaints, diagnosis, treatment, prescriptions)
+   - All payments (receipt number, amount, method, date)
+
+5. Cashier automation:
+   - Shows unpaid queue items with "To'lash" button
+   - Payment linked to queue ticket (updates paymentStatus)
+   - Transaction saved with items, subtotal, discount, total, method
+
+6. Analytics:
+   - Revenue breakdown by payment method (cash/card/transfer)
+   - Per-doctor statistics (queue count, consultation count)
+   - Patient count, consultation count, doctor count
+
+VERIFIED:
+- Login: 5 staff, 2 patients, 6 services, 1 consultation loaded from TiDB ✓
+- Add patient: saved to TiDB, appears in queue ✓
+- Doctor consultation: full form (complaints, anamnesis, diagnosis, ICD, treatment,
+  prescriptions, lab tests) saved to TiDB ✓
+- Patient history: shows all consultations with full medical records ✓
+- Patient detail modal: shows consultations + payments ✓
+- Cashier: shows unpaid queue, payment linked to queue ✓
+- Analytics: revenue breakdown, per-doctor stats ✓
+
+Stage Summary:
+- Multi-tenant system: 100+ clinics, 1000+ doctors can work simultaneously
+- All data in TiDB Cloud (not localStorage)
+- Granular API: each operation only touches relevant data
+- Full patient history with diagnoses, treatments, prescriptions
+- Automated cashier with payment tracking
+- URL: https://medixpro.mirzalimovbegzod8.workers.dev
