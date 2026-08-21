@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { 
   ClinicProfile, 
   ClinicState, 
@@ -21,31 +21,43 @@ import { StorageService } from './services/storageService';
 import { PrinterService } from './services/printerService';
 import { TiDBSyncService } from './services/tidbSyncService';
 
-// Layout Components
+// Layout Components (loaded immediately - they're on every page)
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 
-// View Components
-import { DashboardOverview } from './components/dashboard/DashboardOverview';
-import { ReceptionView } from './components/reception/ReceptionView';
-import { PatientHistoryCentralView } from './components/reception/PatientHistoryCentralView';
-import { QueueTVDisplay } from './components/queue/QueueTVDisplay';
-import { DoctorView } from './components/doctor/DoctorView';
-import { WardsView } from './components/wards/WardsView';
-import { CashierView } from './components/cashier/CashierView';
-import { LabView } from './components/lab/LabView';
-import { PharmacyView } from './components/pharmacy/PharmacyView';
-import { StaffView } from './components/staff/StaffView';
-import { AnalyticsView } from './components/analytics/AnalyticsView';
-import { SettingsView } from './components/settings/SettingsView';
+// View Components - LAZY LOADED (only loaded when user opens that view)
+const DashboardOverview = lazy(() => import('./components/dashboard/DashboardOverview').then(m => ({default: m.DashboardOverview})));
+const ReceptionView = lazy(() => import('./components/reception/ReceptionView').then(m => ({default: m.ReceptionView})));
+const PatientHistoryCentralView = lazy(() => import('./components/reception/PatientHistoryCentralView').then(m => ({default: m.PatientHistoryCentralView})));
+const QueueTVDisplay = lazy(() => import('./components/queue/QueueTVDisplay').then(m => ({default: m.QueueTVDisplay})));
+const DoctorView = lazy(() => import('./components/doctor/DoctorView').then(m => ({default: m.DoctorView})));
+const WardsView = lazy(() => import('./components/wards/WardsView').then(m => ({default: m.WardsView})));
+const CashierView = lazy(() => import('./components/cashier/CashierView').then(m => ({default: m.CashierView})));
+const LabView = lazy(() => import('./components/lab/LabView').then(m => ({default: m.LabView})));
+const PharmacyView = lazy(() => import('./components/pharmacy/PharmacyView').then(m => ({default: m.PharmacyView})));
+const StaffView = lazy(() => import('./components/staff/StaffView').then(m => ({default: m.StaffView})));
+const AnalyticsView = lazy(() => import('./components/analytics/AnalyticsView').then(m => ({default: m.AnalyticsView})));
+const SettingsView = lazy(() => import('./components/settings/SettingsView').then(m => ({default: m.SettingsView})));
 
-// Auth Components & Modals
+// Auth Components (loaded immediately - needed for initial login)
 import { AuthPortal } from './components/auth/AuthPortal';
 import { RegisterClinicModal } from './components/auth/RegisterClinicModal';
 import { StaffLoginModal } from './components/auth/StaffLoginModal';
 import { SessionLockModal } from './components/auth/SessionLockModal';
 import { PrinterSettingsModal } from './components/settings/PrinterSettingsModal';
 import { TiDBSyncModal } from './components/settings/TiDBSyncModal';
+
+// Loading fallback for lazy-loaded views
+function ViewLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center">
+        <div className="inline-block w-12 h-12 border-4 border-slate-700 border-t-blue-500 rounded-full animate-spin mb-3"></div>
+        <div className="text-slate-400 text-sm">Yuklanmoqda...</div>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   // 1. Authenticated Clinic ID (Tenant isolation - zero visibility of other clinics)
@@ -550,12 +562,14 @@ export default function App() {
   // TV Display Mode Fullscreen render
   if (activeView === 'queue_tv') {
     return (
-      <QueueTVDisplay
-        queue={clinicData.queue}
-        staffList={clinicData.staffList}
-        clinic={clinicData.currentClinic}
-        onClose={() => setActiveView('dashboard')}
-      />
+      <Suspense fallback={<ViewLoader />}>
+        <QueueTVDisplay
+          queue={clinicData.queue}
+          staffList={clinicData.staffList}
+          clinic={clinicData.currentClinic}
+          onClose={() => setActiveView('dashboard')}
+        />
+      </Suspense>
     );
   }
 
@@ -610,139 +624,140 @@ export default function App() {
 
         {/* Content View Routing Area */}
         <main className="flex-1 overflow-y-auto pb-16">
-          {activeView === 'dashboard' && (
-            <DashboardOverview
-              clinic={clinicData.currentClinic}
-              patients={clinicData.patients}
-              queue={clinicData.queue}
-              wards={clinicData.wards}
-              transactions={clinicData.transactions}
-              staffList={clinicData.staffList}
-              labOrders={clinicData.labOrders}
-              onNavigate={setActiveView}
-            />
-          )}
+          <Suspense fallback={<ViewLoader />}>
+            {activeView === 'dashboard' && (
+              <DashboardOverview
+                clinic={clinicData.currentClinic}
+                patients={clinicData.patients}
+                queue={clinicData.queue}
+                wards={clinicData.wards}
+                transactions={clinicData.transactions}
+                staffList={clinicData.staffList}
+                labOrders={clinicData.labOrders}
+                onNavigate={setActiveView}
+              />
+            )}
 
-          {activeView === 'reception' && (
-            <ReceptionView
-              patients={clinicData.patients}
-              staffList={clinicData.staffList}
-              services={clinicData.services}
-              queue={clinicData.queue}
-              wards={clinicData.wards}
-              clinic={clinicData.currentClinic}
-              printerConfig={clinicData.printerConfig}
-              consultations={clinicData.consultations}
-              onAddPatient={handleAddPatient}
-              onUpdatePatient={(p) => {
-                updateAndSaveState(prev => ({
-                  ...prev,
-                  patients: prev.patients.map(item => item.id === p.id ? p : item)
-                }));
-              }}
-              onCreateQueueTicket={handleAddToQueue}
-              onUpdateQueueStatus={handleUpdateQueueStatus}
-            />
-          )}
+            {activeView === 'reception' && (
+              <ReceptionView
+                patients={clinicData.patients}
+                staffList={clinicData.staffList}
+                services={clinicData.services}
+                queue={clinicData.queue}
+                wards={clinicData.wards}
+                clinic={clinicData.currentClinic}
+                printerConfig={clinicData.printerConfig}
+                consultations={clinicData.consultations}
+                onAddPatient={handleAddPatient}
+                onUpdatePatient={(p) => {
+                  updateAndSaveState(prev => ({
+                    ...prev,
+                    patients: prev.patients.map(item => item.id === p.id ? p : item)
+                  }));
+                }}
+                onCreateQueueTicket={handleAddToQueue}
+                onUpdateQueueStatus={handleUpdateQueueStatus}
+              />
+            )}
 
-          {activeView === 'patient_history' && (
-            <PatientHistoryCentralView
-              patients={clinicData.patients}
-              queue={clinicData.queue}
-              consultations={clinicData.consultations}
-              labOrders={clinicData.labOrders}
-              transactions={clinicData.transactions}
-              wards={clinicData.wards}
-              clinic={clinicData.currentClinic}
-              printerConfig={clinicData.printerConfig}
-            />
-          )}
+            {activeView === 'patient_history' && (
+              <PatientHistoryCentralView
+                patients={clinicData.patients}
+                queue={clinicData.queue}
+                consultations={clinicData.consultations}
+                labOrders={clinicData.labOrders}
+                transactions={clinicData.transactions}
+                wards={clinicData.wards}
+                clinic={clinicData.currentClinic}
+                printerConfig={clinicData.printerConfig}
+              />
+            )}
 
-          {activeView === 'doctor' && (
-            <DoctorView
-              currentUser={currentUser}
-              staffList={clinicData.staffList}
-              queue={clinicData.queue}
-              patients={clinicData.patients}
-              consultations={clinicData.consultations}
-              labOrders={clinicData.labOrders}
-              transactions={clinicData.transactions}
-              clinic={clinicData.currentClinic}
-              printerConfig={clinicData.printerConfig}
-              customProtocols={customProtocols}
-              onUpdateQueueStatus={handleUpdateQueueStatus}
-              onSaveConsultation={handleSaveConsultation}
-              onOrderLabTest={handleAddLabOrder}
-              onSaveCustomProtocol={handleSaveCustomProtocol}
-            />
-          )}
+            {activeView === 'doctor' && (
+              <DoctorView
+                currentUser={currentUser}
+                staffList={clinicData.staffList}
+                queue={clinicData.queue}
+                patients={clinicData.patients}
+                consultations={clinicData.consultations}
+                labOrders={clinicData.labOrders}
+                transactions={clinicData.transactions}
+                clinic={clinicData.currentClinic}
+                printerConfig={clinicData.printerConfig}
+                customProtocols={customProtocols}
+                onUpdateQueueStatus={handleUpdateQueueStatus}
+                onSaveConsultation={handleSaveConsultation}
+                onOrderLabTest={handleAddLabOrder}
+                onSaveCustomProtocol={handleSaveCustomProtocol}
+              />
+            )}
 
-          {activeView === 'wards' && (
-            <WardsView
-              wards={clinicData.wards}
-              patients={clinicData.patients}
-              staffList={clinicData.staffList}
-              clinic={clinicData.currentClinic}
-              onAdmitPatient={handleAdmitPatient}
-              onDischargePatient={handleDischargePatient}
-              onUpdateBedStatus={handleUpdateBedStatus}
-              onAddWardRoom={handleAddWardRoom}
-            />
-          )}
+            {activeView === 'wards' && (
+              <WardsView
+                wards={clinicData.wards}
+                patients={clinicData.patients}
+                staffList={clinicData.staffList}
+                clinic={clinicData.currentClinic}
+                onAdmitPatient={handleAdmitPatient}
+                onDischargePatient={handleDischargePatient}
+                onUpdateBedStatus={handleUpdateBedStatus}
+                onAddWardRoom={handleAddWardRoom}
+              />
+            )}
 
-          {activeView === 'cashier' && (
-            <CashierView
-              transactions={clinicData.transactions}
-              patients={clinicData.patients}
-              services={clinicData.services}
-              currentUser={currentUser}
-              clinic={clinicData.currentClinic}
-              printerConfig={clinicData.printerConfig}
-              onAddTransaction={handleAddTransaction}
-            />
-          )}
+            {activeView === 'cashier' && (
+              <CashierView
+                transactions={clinicData.transactions}
+                patients={clinicData.patients}
+                services={clinicData.services}
+                currentUser={currentUser}
+                clinic={clinicData.currentClinic}
+                printerConfig={clinicData.printerConfig}
+                onAddTransaction={handleAddTransaction}
+              />
+            )}
 
-          {activeView === 'lab' && (
-            <LabView
-              labOrders={clinicData.labOrders}
-              patients={clinicData.patients}
-              staffList={clinicData.staffList}
-              clinic={clinicData.currentClinic}
-              printerConfig={clinicData.printerConfig}
-              onUpdateLabOrder={handleUpdateLabOrder}
-              onAddLabOrder={handleAddLabOrder}
-            />
-          )}
+            {activeView === 'lab' && (
+              <LabView
+                labOrders={clinicData.labOrders}
+                patients={clinicData.patients}
+                staffList={clinicData.staffList}
+                clinic={clinicData.currentClinic}
+                printerConfig={clinicData.printerConfig}
+                onUpdateLabOrder={handleUpdateLabOrder}
+                onAddLabOrder={handleAddLabOrder}
+              />
+            )}
 
-          {activeView === 'pharmacy' && (
-            <PharmacyView
-              inventory={clinicData.pharmacy}
-              clinic={clinicData.currentClinic}
-              onAddItem={handleAddPharmacyItem}
-              onUpdateStock={handleUpdatePharmacyStock}
-            />
-          )}
+            {activeView === 'pharmacy' && (
+              <PharmacyView
+                inventory={clinicData.pharmacy}
+                clinic={clinicData.currentClinic}
+                onAddItem={handleAddPharmacyItem}
+                onUpdateStock={handleUpdatePharmacyStock}
+              />
+            )}
 
-          {activeView === 'staff' && (
-            <StaffView
-              staffList={clinicData.staffList}
-              clinic={clinicData.currentClinic}
-              onAddStaff={handleAddStaff}
-              onUpdateStaff={handleUpdateStaff}
-              onDeleteStaff={handleDeleteStaff}
-              onLoginAsStaff={handleStaffLogin}
-            />
-          )}
+            {activeView === 'staff' && (
+              <StaffView
+                staffList={clinicData.staffList}
+                clinic={clinicData.currentClinic}
+                onAddStaff={handleAddStaff}
+                onUpdateStaff={handleUpdateStaff}
+                onDeleteStaff={handleDeleteStaff}
+                onLoginAsStaff={handleStaffLogin}
+              />
+            )}
 
-          {activeView === 'analytics' && (
-            <AnalyticsView
-              transactions={clinicData.transactions}
-              patients={clinicData.patients}
-              consultations={clinicData.consultations}
-              staffList={clinicData.staffList}
-              clinic={clinicData.currentClinic}
-            />
-          )}
+            {activeView === 'analytics' && (
+              <AnalyticsView
+                transactions={clinicData.transactions}
+                patients={clinicData.patients}
+                consultations={clinicData.consultations}
+                staffList={clinicData.staffList}
+                clinic={clinicData.currentClinic}
+              />
+            )}
 
           {activeView === 'settings' && (
             <SettingsView
@@ -757,6 +772,7 @@ export default function App() {
               onImportAllData={handleImportAllData}
             />
           )}
+          </Suspense>
         </main>
       </div>
 
